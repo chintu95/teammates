@@ -39,7 +39,6 @@ public class AdminActivityLogPageAction extends Action {
     private static final int MAX_VERSIONS_TO_QUERY = 1 + 5; //the current version and its 5 preceding versions
     
     private int totalLogsSearched;
-    private boolean isFirstRow = true;
     private Long nextEndTimeToSearch;
     
     @Override
@@ -259,16 +258,14 @@ public class AdminActivityLogPageAction extends Action {
             }
             
             ActivityLogEntry activityLogEntry = new ActivityLogEntry(appLog);
-            activityLogEntry = data.filterLogs(activityLogEntry);
-            
-            boolean isToShow = activityLogEntry.toShow() && (!activityLogEntry.isTestingData() || data.getIfShowTestData());
-            if (!isToShow) {
+                       
+            if (!data.filterLogs(activityLogEntry)) {
                 continue;
             }
-            if (isFirstRow) {
-                activityLogEntry.setFirstRow();
-                isFirstRow = false;
+            if (activityLogEntry.isTestingData() && !data.getIfShowTestData()) {
+                continue;
             }
+            
             appLogs.add(activityLogEntry);
         }
         return appLogs;

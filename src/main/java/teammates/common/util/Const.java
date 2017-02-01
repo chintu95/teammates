@@ -1461,5 +1461,21 @@ public final class Const {
                 + "the question, do consider communications made informally within the team, and formal communications with "
                 + "the instructors and tutors.&quot;";
     }
+    
+    public static class ActivityLog {
+        public static final String TEAMMATESLOG = "TEAMMATESLOG";
+        
+        public static final String UNKNOWN = "Unknown";
+        
+        public static final String ROLE_ADMIN = "Admin";
+        public static final String ROLE_INSTRUCTOR = "Instructor";
+        public static final String ROLE_STUDENT = "Student";
+        public static final String ROLE_AUTO = "Auto";
+        public static final String ROLE_UNREGISTERED = "Unregistered";
+        public static final String ROLE_UNKNOWN = "Unknown";
+        public static final String MASQUERADE_ROLE_POSTFIX = "(M)";
+        
+        public static final String AUTH_UNLOGIN = "Unregistered";
+    }
 
 }
