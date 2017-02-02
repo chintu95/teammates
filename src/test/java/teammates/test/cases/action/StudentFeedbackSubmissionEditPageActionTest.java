@@ -146,7 +146,7 @@ public class StudentFeedbackSubmissionEditPageActionTest extends BaseActionTest 
 
             AssertHelper.assertLogMessageEqualsForUnregisteredStudentUser(
                             "TEAMMATESLOG|||studentFeedbackSubmissionEditPage|||studentFeedbackSubmissionEditPage|||"
-                          + "true|||Unregistered:idOfTypicalCourse1|||Unreg Student|||Unregistered|||unreg@stud.ent|||"
+                          + "true|||Unregistered:idOfTypicalCourse1|||Unreg Student|||Unknown|||unreg@stud.ent|||"
                           + "null|||/page/studentFeedbackSubmissionEditPage", pageAction.getLogMessage(),
                             unregStudent.email, unregStudent.course);
             
