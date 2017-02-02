@@ -1472,7 +1472,7 @@ public final class Const {
         public static final String ROLE_UNREGISTERED = "Unregistered";
         public static final String MASQUERADE_ROLE_POSTFIX = "(M)";
         
-        public static final String AUTH_UNLOGIN = "Unknown";
+        public static final String AUTH_NOTLOGIN = "Unknown";
         
         public static final String PREFIX_STUDENT_PAGE = "student";
         public static final String PREFIX_INSTRUCTOR_PAGE = "instructor";
