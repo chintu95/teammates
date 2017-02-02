@@ -28,7 +28,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
     
     private ActivityLogGenerator logCenter = new ActivityLogGenerator();
 
-    // TODO: can remove log verification in action test cases
+    // TODO: can move log verification in action test cases to here or remove them totally
     
     @Test
     public void testGenerateSystemErrorReportLogMessage() {
@@ -60,7 +60,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
                     + "|||Unknown|||Unknown|||Unknown|||";
         
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contain courseId and email
+        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains courseId and email
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
                     + "|||Unknown|||Unknown|||Unknown|||Unknown|||";
         
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contain courseId and email
+        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains courseId and email
     }
     
     @Test
@@ -101,7 +101,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         
         String generatedMessage = logCenter.generateBasicActivityLogMessage(url, mockParamMap, "auto task", null);
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(generatedMessage.contains("Auto")); // log id contain auto
+        assertTrue(generatedMessage.contains("Auto")); // log id contains auto
         
         // other situations tested in testGenerateNormalPageActionLogMessage
     }
@@ -128,7 +128,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         String generatedMessage = logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                                     null, null, null, "Not authorized");
         AssertHelper.assertLogMessageEquals(logMessage, generatedMessage);
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contain course id and email
+        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains course id and email
         
         ______TS("Not google login but with key (success)");
         
@@ -139,7 +139,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         
         AssertHelper.assertLogMessageEquals(logMessage, // auth success will pass unregistered student
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap, null, null, student, "Join Course"));
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contain course id and email
+        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains course id and email
         
         // --------------- Google login ---------------
         
@@ -165,7 +165,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         userType.isInstructor = true;
         AccountAttributes acc = new AccountAttributes("googleId", "david", false, "david@email.com", "NUS");
         
-        AssertHelper.assertLogMessageEquals(logMessage, // google login will pass userType and account
+        AssertHelper.assertLogMessageEquals(logMessage, // userType and account will be passed for logged-in user
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                         userType, acc, null, "View Result"));
 
@@ -175,14 +175,14 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         url = Const.ActionURIs.STUDENT_FEEDBACK_RESULTS_PAGE;
         logMessage = String.format(logTemplate, "studentFeedbackResultsPage", "Student");
         
-        AssertHelper.assertLogMessageEquals(logMessage, // google login will pass userType and account
+        AssertHelper.assertLogMessageEquals(logMessage, // userType and account will be passed for logged-in user
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                     userType, acc, null, "View Result"));
         
         url = Const.ActionURIs.INSTRUCTOR_COURSE_EDIT_PAGE;
         logMessage = String.format(logTemplate, "instructorCourseEditPage", "Instructor");
         
-        AssertHelper.assertLogMessageEquals(logMessage, // google login will pass userType and account
+        AssertHelper.assertLogMessageEquals(logMessage, // userType and account will be passed for logged-in user
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                     userType, acc, null, "View Result"));
         
@@ -192,14 +192,14 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         url = Const.ActionURIs.STUDENT_FEEDBACK_RESULTS_PAGE;
         logMessage = String.format(logTemplate, "studentFeedbackResultsPage", "Student");
         
-        AssertHelper.assertLogMessageEquals(logMessage, // google login will pass userType and account
+        AssertHelper.assertLogMessageEquals(logMessage, // userType and account will be passed for logged-in user
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                     userType, acc, null, "View Result"));
         
         url = Const.ActionURIs.INSTRUCTOR_COMMENTS_PAGE;
         logMessage = String.format(logTemplate, "instructorCommentsPage", "Instructor");
         
-        AssertHelper.assertLogMessageEquals(logMessage, // google login will pass userType and account
+        AssertHelper.assertLogMessageEquals(logMessage, // userType and account will be passed for logged-in user
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                     userType, acc, null, "View Result"));
         
@@ -207,7 +207,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         logMessage = "TEAMMATESLOG|||adminActivityLogPage|||adminActivityLogPage|||true|||Admin|||david"
                 + "|||googleId|||david@email.com|||View Result|||/admin/adminActivityLogPage";
         
-        AssertHelper.assertLogMessageEquals(logMessage, // google login will pass userType and account
+        AssertHelper.assertLogMessageEquals(logMessage, // userType and account will be passed for logged-in user
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                     userType, acc, null, "View Result"));
         
@@ -219,7 +219,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         logMessage = "TEAMMATESLOG|||instructorCommentsPage|||instructorCommentsPage|||true|||Instructor(M)|||david"
                 + "|||anotherGoogleId|||david@email.com|||View comments|||/page/instructorCommentsPage";
         
-        AssertHelper.assertLogMessageEquals(logMessage, // Masquerade: userType and acc don't have same google id
+        AssertHelper.assertLogMessageEquals(logMessage, // Masquerade: userType and acc don't have the same google id
                 logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                     userType, acc, null, "View comments"));
         
@@ -230,7 +230,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         String logMessageWithoutTimeTaken = "TEAMMATESLOG|||instructorHome|||Pageload|||true|||Instructor"
                     + "|||UserName|||UserId|||UserEmail|||Message|||URL|||UserId20151019143729608";
         AppLogLine appLog = new AppLogLine();
-        appLog.setLogMessage(logMessageWithoutTimeTaken + "|||20"); // with TimeTaken
+        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPERATOR + "20"); // with TimeTaken
         ActivityLogEntry entry = logCenter.generateActivityLogFromAppLogLine(appLog);
         assertEquals(logMessageWithoutTimeTaken, entry.generateLogMessage());
         assertEquals(20, entry.getActionTimeTaken());
@@ -253,10 +253,10 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
     
     private boolean isGoogleIdContainInLogAndLogId(String googleId, String generatedMessage) {
         int googleIdPosition = generatedMessage.indexOf(googleId);
-        if (googleIdPosition == -1) { // check that google id is in google id field
+        if (googleIdPosition == -1) { // check that google id is in 'google id' field
             return false;
         }
-        // check that google id is in log id field
+        // check that google id is in 'log id' field
         return generatedMessage.indexOf(googleId, googleIdPosition + 1) != -1;
     }
     

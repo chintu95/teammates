@@ -64,7 +64,8 @@ public class FeedbackResponseAdjustmentWorkerAction extends AutomatedAction {
             } catch (Exception e) {
                 String url = HttpRequestHelper.getRequestedUrl(request);
                 Map<String, String[]> params = HttpRequestHelper.getParameterMap(request);
-                log.severe(String.format(errorString, sessionName, courseId, e.getMessage(), // no user login for worker
+                // no logged-in user for worker
+                log.severe(String.format(errorString, sessionName, courseId, e.getMessage(),
                                new ActivityLogGenerator().generateServletActionFailureLogMessage(url, params, e, null)));
                 setForRetry();
                 return;
