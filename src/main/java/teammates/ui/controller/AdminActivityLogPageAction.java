@@ -10,6 +10,7 @@ import teammates.common.datatransfer.CourseAttributes;
 import teammates.common.datatransfer.FeedbackSessionAttributes;
 import teammates.common.exception.EntityDoesNotExistException;
 import teammates.common.util.ActivityLogEntry;
+import teammates.common.util.ActivityLogGenerator;
 import teammates.common.util.AdminLogQuery;
 import teammates.common.util.Const;
 import teammates.common.util.GaeLogApi;
@@ -142,7 +143,7 @@ public class AdminActivityLogPageAction extends Action {
         }
         //  if the search space is limited to a certain log
         if (logs.size() >= RELEVANT_LOGS_PER_PAGE && earliestLogChecked != null) {
-            earliestSearchTime = earliestLogChecked.getTime();
+            earliestSearchTime = earliestLogChecked.getLogTime();
         }
         
         double targetTimeZone = Const.DOUBLE_UNINITIALIZED;
@@ -258,7 +259,7 @@ public class AdminActivityLogPageAction extends Action {
                 continue;
             }
             
-            ActivityLogEntry activityLogEntry = new ActivityLogEntry(appLog);
+            ActivityLogEntry activityLogEntry = new ActivityLogGenerator().generateActivityLogFromAppLogLine(appLog);
             activityLogEntry = data.filterLogs(activityLogEntry);
             
             boolean isToShow = activityLogEntry.toShow() && (!activityLogEntry.isTestingData() || data.getIfShowTestData());

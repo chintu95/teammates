@@ -159,7 +159,7 @@ public class AdminActivityLogPageData extends PageData {
         
         for (String uri : excludedLogRequestURIs) {
             
-            if (uri.contains(logEntry.getServletName())) {
+            if (uri.contains(logEntry.getActionServletName())) {
                 return true;
             }
         }
@@ -185,32 +185,32 @@ public class AdminActivityLogPageData extends PageData {
         }
         
         //Filter based on what is in the query
-        if (q.isRequestInQuery && !arrayContains(q.requestValues, logEntry.getServletName())) {
+        if (q.isRequestInQuery && !arrayContains(q.requestValues, logEntry.getActionServletName())) {
             logEntry.setToShow(false);
             return logEntry;
         }
-        if (q.isResponseInQuery && !arrayContains(q.responseValues, logEntry.getAction())) {
+        if (q.isResponseInQuery && !arrayContains(q.responseValues, logEntry.getActionName())) {
             logEntry.setToShow(false);
             return logEntry;
         }
         if (q.isPersonInQuery
-                && !logEntry.getName().toLowerCase().contains(q.personValue.toLowerCase())
-                && !logEntry.getGoogleId().toLowerCase().contains(q.personValue.toLowerCase())
-                && !logEntry.getEmail().toLowerCase().contains(q.personValue.toLowerCase())) {
+                && !logEntry.getUserName().toLowerCase().contains(q.personValue.toLowerCase())
+                && !logEntry.getUserGoogleId().toLowerCase().contains(q.personValue.toLowerCase())
+                && !logEntry.getUserEmail().toLowerCase().contains(q.personValue.toLowerCase())) {
             logEntry.setToShow(false);
             return logEntry;
         }
-        if (q.isRoleInQuery && !arrayContains(q.roleValues, logEntry.getRole())) {
+        if (q.isRoleInQuery && !arrayContains(q.roleValues, logEntry.getUserRole())) {
             logEntry.setToShow(false);
             return logEntry;
         }
         if (q.isCutoffInQuery) {
-            if (logEntry.getTimeTaken() == null) {
+            if (logEntry.getActionTimeTaken() == 0) {
                 logEntry.setToShow(false);
                 return logEntry;
             }
             
-            if (logEntry.getTimeTaken() < q.cutoffValue) {
+            if (logEntry.getActionTimeTaken() < q.cutoffValue) {
                 logEntry.setToShow(false);
                 return logEntry;
             }
@@ -229,7 +229,7 @@ public class AdminActivityLogPageData extends PageData {
             logEntry.highlightKeyStringInMessageInfoHtml();
             return logEntry;
         }
-        if (q.isIdInQuery && !arrayContains(q.idValues, logEntry.getId())) {
+        if (q.isIdInQuery && !arrayContains(q.idValues, logEntry.getLogId())) {
             logEntry.setToShow(false);
             return logEntry;
         }

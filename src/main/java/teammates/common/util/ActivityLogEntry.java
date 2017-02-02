@@ -1,295 +1,78 @@
 package teammates.common.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-
-import teammates.common.datatransfer.AccountAttributes;
-import teammates.common.datatransfer.StudentAttributes;
-import teammates.common.datatransfer.UserType;
-import teammates.common.exception.TeammatesException;
-
-import com.google.appengine.api.log.AppLogLine;
 
 /** A log entry to describe an action carried out by the app */
 public class ActivityLogEntry {
-    
     // The following constants describe the positions of the attributes
     // in the log message. i.e
     // TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||TIME_TAKEN
-    public static final int POSITION_OF_SERVLETNAME = 1;
-    public static final int POSITION_OF_ACTION = 2;
-    public static final int POSITION_OF_TOSHOW = 3;
-    public static final int POSITION_OF_ROLE = 4;
-    public static final int POSITION_OF_NAME = 5;
-    public static final int POSITION_OF_GOOGLEID = 6;
-    public static final int POSITION_OF_EMAIL = 7;
-    public static final int POSITION_OF_MESSAGE = 8;
-    public static final int POSITION_OF_URL = 9;
-    public static final int POSITION_OF_ID = 10;
-    public static final int POSITION_OF_TIMETAKEN = 11;
+    public static final int POSITION_OF_ACTION_SERVLETNAME = 1;
+    public static final int POSITION_OF_ACTION_NAME = 2;
+    public static final int POSITION_OF_LOG_TOSHOW = 3;
+    public static final int POSITION_OF_USER_ROLE = 4;
+    public static final int POSITION_OF_USER_NAME = 5;
+    public static final int POSITION_OF_USER_GOOGLEID = 6;
+    public static final int POSITION_OF_USER_EMAIL = 7;
+    public static final int POSITION_OF_LOG_MESSAGE = 8;
+    public static final int POSITION_OF_ACTION_URL = 9;
+    public static final int POSITION_OF_LOG_ID = 10;
+    public static final int POSITION_OF_LOG_TIMETAKEN = 11;
     
+    // UI part
     private static final int TIME_TAKEN_WARNING_LOWER_RANGE = 10000;
     private static final int TIME_TAKEN_WARNING_UPPER_RANGE = 20000;
     private static final int TIME_TAKEN_DANGER_UPPER_RANGE = 60000;
     
-    private static final Logger log = Logger.getLogger();
-
-    private long time;
-    private String servletName;
-    private String action; //TODO: remove if not needed (and rename servletName to action)
-    private String role;
-    private String name;
-    private String googleId;
-    private String email;
-    private boolean toShow;
-    private String message;
-    private String url;
-    private Long timeTaken;
+    // Required fields
     
     // id can be in the form of <googleId>%<time> e.g. bamboo3250%20151103170618465
     // or <studentemail>%<courseId>%<time> (for unregistered students)
     //     e.g. bamboo@gmail.tmt%instructor.ema-demo%20151103170618465
-    private String id;
-    private boolean isFirstRow;
+    private String logId;
+    private long logTime;
     
-    @SuppressWarnings("unused") // used by js
-    private String logInfoAsHtml;
+    private String actionServletName;
+    private String actionName;
+    
+    // Optional fields
+    
+    private String userRole;
+    private boolean isMasqueradeUserRole;
+    
+    private String userName;
+    private String userEmail;
+    private String userGoogleId;
+    
+    private String logMessage;
+    
+    private String actionUrl;
+    
+    private long actionTimeTaken;
+    
+    // legacy of messing up UI and logic
+    private boolean logToShow = true;
+    
+    private boolean isFirstRow;
     
     private String[] keyStringsToHighlight;
     
-    /**
-     * Constructor that creates a empty ActivityLog
-     */
-    public ActivityLogEntry(String servlet, String params, String link) {
-        time = System.currentTimeMillis();
-        servletName = servlet;
-        action = "Unknown";
-        role = "Unknown";
-        name = "Unknown";
-        googleId = "Unknown";
-        email = "Unknown";
-        toShow = true;
-        message = "<span class=\"text-danger\">"
-                    + "Error. ActivityLogEntry object is not created for this servlet action."
-                + "</span>"
-                + "<br>"
-                + params;
-        url = link;
-        id = "Unknown";
-    }
-
-    /**
-     * Constructor that creates an ActivityLog object from a app log on the server.
-     * Used in AdminActivityLogServlet.
-     */
-    public ActivityLogEntry(AppLogLine appLog) {
-        time = appLog.getTimeUsec() / 1000;
-        
-        try {
-            String[] tokens = appLog.getLogMessage().split("\\|\\|\\|", -1);
-            initUsingAppLogMessage(tokens);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            initAsFailure(appLog, e);
-        }
-        
-        keyStringsToHighlight = null;
-        logInfoAsHtml = getLogInfoForTableRowAsHtml();
-    }
-
-    /**
-     * Constructor that creates an ActivityLog object from scratch
-     * Used in the various servlets in the application
-     */
-    public ActivityLogEntry(String servlet, String act, AccountAttributes acc, String params, String link,
-                            UserType userType) {
-        this(servlet, act, acc, params, link, null, null, userType);
-    }
-
-    /**
-     * Constructs a ActivityLogEntry.
-     * The googleId in the log will be based on the {@code acc} or {@code userType} passed in
-     * For the log id, if the googleId is unknown, the {@code unregisteredUserCourse} and {@code unregisteredUserEmail}
-     * will be used to construct the id.
-     */
-    public ActivityLogEntry(String servlet, String act, AccountAttributes acc, String params, String link,
-                            String unregisteredUserCourse, String unregisteredUserEmail, UserType userType) {
-        time = System.currentTimeMillis();
-        servletName = servlet;
-        action = act;
-        toShow = true;
-        message = params;
-        url = link;
-        
-        if (acc == null) {
-            role = "Unknown";
-            name = "Unknown";
-            email = "Unknown";
-            googleId = userType == null ? "Unknown" : userType.id;
-        
-        } else {
-            role = acc.isInstructor ? "Instructor" : "Student";
-            name = acc.name;
-            googleId = acc.googleId;
-            email = acc.email;
-        }
-        id = generateLogId(googleId, unregisteredUserEmail, unregisteredUserCourse, time);
-        
-        role = changeRoleToAutoIfAutomatedActions(servletName, role);
-    }
-    
-    public ActivityLogEntry(AccountAttributes userAccount, boolean isMasquerade, String logMessage,
-                            String requestUrl, StudentAttributes unregisteredStudent, UserType userType) {
-        time = System.currentTimeMillis();
-        try {
-            servletName = getActionName(requestUrl);
-        } catch (Exception e) {
-            servletName = "error in getActionName for requestUrl : " + requestUrl;
-        }
-        action = servletName; //TODO: remove this?
-        toShow = true;
-        message = logMessage;
-        url = requestUrl;
-       
-        boolean isAccountWithGoogleId = userAccount != null && userAccount.googleId != null;
-        boolean isUnregisteredStudent = unregisteredStudent != null;
-        if (isAccountWithGoogleId) {
-            if (userType.isInstructor && !userType.isStudent && !userType.isAdmin) {
-                role = "Instructor";
-            } else if (!userType.isInstructor && userType.isStudent && !userType.isAdmin) {
-                role = "Student";
-            } else if (userType.isInstructor && userType.isStudent && !userType.isAdmin) {
-                role = servletName.toLowerCase().startsWith("instructor") ? "Instructor" : "Student";
-                role = Const.ActionURIs.INSTRUCTOR_FEEDBACK_STATS_PAGE.contains(servletName) ? "Instructor" : role;
-            } else if (userType.isAdmin) {
-                role = "Admin";
-                role = servletName.toLowerCase().startsWith("instructor") ? "Instructor" : role;
-                role = servletName.toLowerCase().startsWith("student") ? "Student" : role;
-                role = Const.ActionURIs.INSTRUCTOR_FEEDBACK_STATS_PAGE.contains(servletName) ? "Instructor" : role;
-            } else {
-                role = "Unregistered";
-            }
-            
-            role = role + (isMasquerade ? "(M)" : "");
-            name = userAccount.name;
-            googleId = userAccount.googleId;
-            email = userAccount.email;
-        } else if (isUnregisteredStudent) {
-            role = "Unregistered";
-            if (unregisteredStudent.course != null && !unregisteredStudent.course.isEmpty()) {
-                role = "Unregistered" + ":" + unregisteredStudent.course;
-            }
-            
-            name = unregisteredStudent.name;
-            googleId = "Unregistered";
-            email = unregisteredStudent.email;
-        } else {
-            
-            //this is a shallow fix for logging redirected student to join authenticated action
-            if (Const.ActionURIs.STUDENT_COURSE_JOIN_AUTHENTICATED.toLowerCase().contains(servletName.toLowerCase())) {
-                role = "Unregistered";
-            } else {
-                role = "Unknown";
-            }
-            name = "Unknown";
-            googleId = "Unknown";
-            email = "Unknown";
-        }
-        
-        role = changeRoleToAutoIfAutomatedActions(servletName, role);
-        id = generateLogId(googleId, unregisteredStudent, time);
-    }
-    
-    private void initUsingAppLogMessage(String[] tokens) {
-        // TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||
-        // MESSAGE(IN HTML)|||URL|||ID|||TIME_TAKEN
-        servletName = tokens[POSITION_OF_SERVLETNAME];
-        action = tokens[POSITION_OF_ACTION];
-        toShow = Boolean.parseBoolean(tokens[POSITION_OF_TOSHOW]);
-        role = tokens[POSITION_OF_ROLE];
-        name = tokens[POSITION_OF_NAME];
-        googleId = tokens[POSITION_OF_GOOGLEID];
-        email = tokens[POSITION_OF_EMAIL];
-        message = tokens[POSITION_OF_MESSAGE];
-        url = tokens[POSITION_OF_URL];
-        
-        boolean isLogWithTimeTakenAndId = tokens.length >= POSITION_OF_ID + 1;
-        if (isLogWithTimeTakenAndId) {
-            id = tokens[POSITION_OF_ID];
-            try {
-                timeTaken = tokens.length == 12 ? Long.parseLong(tokens[POSITION_OF_TIMETAKEN].trim())
-                                                : null;
-            } catch (NumberFormatException e) {
-                timeTaken = null;
-                log.severe("Log message format not as expected: " + Arrays.toString(tokens));
-            }
-        }
-    }
-
-    private void initAsFailure(AppLogLine appLog, Exception e) {
-        servletName = "Unknown";
-        action = "Unknown";
-        role = "Unknown";
-        name = "Unknown";
-        googleId = "Unknown";
-        email = "Unknown";
-        toShow = true;
-        message = "<span class=\"text-danger\">Error. Problem parsing log message from the server.</span><br>"
-                + "System Error: " + e.getMessage() + "<br>" + appLog.getLogMessage();
-        url = "Unknown";
-        id = "Unknown" + "%" + formatTimeForId(new Date(time));
-        timeTaken = null;
-    }
-
-    private String changeRoleToAutoIfAutomatedActions(String servletName, String role) {
-        return servletName.startsWith("/auto/") ? "Auto" : role;
-    }
-    
-    private String formatTimeForId(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSS");
-        sdf.setTimeZone(TimeZone.getTimeZone(Const.SystemParams.ADMIN_TIME_ZONE));
-        return sdf.format(date.getTime());
-    }
-
-    public String getIconRoleForShow() {
-        StringBuilder iconRole = new StringBuilder(100);
-        
-        if (role.contains("Instructor")) {
-            iconRole.append("<span class = \"glyphicon glyphicon-user\" style=\"color:#39b3d7;\"></span>");
-            if (role.contains("(M)")) {
-                iconRole.append("-<span class = \"glyphicon glyphicon-eye-open\" style=\"color:#E61E1E;\"></span>- ");
-            }
-        } else if (role.contains("Student")) {
-            iconRole.append("<span class = \"glyphicon glyphicon-user\" style=\"color:#FFBB13;\"></span>");
-            if (role.contains("(M)")) {
-                iconRole.append("-<span class = \"glyphicon glyphicon-eye-open\" style=\"color:#E61E1E;\"></span>- ");
-            }
-        } else if (role.contains("Unregistered")) {
-            iconRole.append("<span class = \"glyphicon glyphicon-user\"></span>");
-        } else if (role.contains("Auto")) {
-            iconRole.append("<span class = \"glyphicon glyphicon-cog\"></span>");
-        } else {
-            iconRole.append(role);
-        }
-
-        if (role.contains("Admin")) {
-            iconRole.append("<span class = \"glyphicon glyphicon-user\" style=\"color:#E61E1E;\"></span>");
-        }
-
-        return iconRole.toString();
-    }
-    
-    /**
-     * Assumption: the {@code requestUrl} is in the format "/something/actionName"
-     *   possibly followed by "?something" e.g., "/page/studentHome?user=abc"
-     * @return action name in the URL e.g., "studentHome" in the above example.
-     */
-    public static String getActionName(String requestUrl) {
-        return requestUrl.split("/")[2].split("\\?")[0];
+    public ActivityLogEntry(Builder builder) {
+        logTime = builder.logTime;
+        actionServletName = builder.actionServletName;
+        actionTimeTaken = builder.actionTimeTaken;
+        actionName = builder.actionName;
+        userRole = builder.userRole;
+        userName = builder.userName;
+        userGoogleId = builder.userGoogleId;
+        userEmail = builder.userEmail;
+        logMessage = builder.logMessage;
+        actionUrl = builder.actionUrl;
+        logId = builder.logId;
+        actionTimeTaken = builder.actionTimeTaken;
+        isMasqueradeUserRole = builder.isMasqueradeUserRole;
     }
 
     /**
@@ -297,63 +80,160 @@ public class ActivityLogEntry {
      */
     public String generateLogMessage() {
         //TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||ID
-        return "TEAMMATESLOG|||" + servletName + "|||" + action + "|||" + (toShow ? "true" : "false") + "|||"
-                + role + "|||" + name + "|||" + googleId + "|||" + email + "|||" + message + "|||" + url + "|||" + id;
+        return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPERATOR
+                + actionServletName + Const.ActivityLog.FIELD_SEPERATOR
+                + actionName + Const.ActivityLog.FIELD_SEPERATOR
+                + (logToShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPERATOR
+                + userRole + (isMasqueradeUserRole ? "(M)" : "") + Const.ActivityLog.FIELD_SEPERATOR
+                + userName + Const.ActivityLog.FIELD_SEPERATOR + userGoogleId
+                + Const.ActivityLog.FIELD_SEPERATOR
+                + userEmail + Const.ActivityLog.FIELD_SEPERATOR
+                + logMessage + Const.ActivityLog.FIELD_SEPERATOR
+                + actionUrl + Const.ActivityLog.FIELD_SEPERATOR
+                + logId;
     }
+    
+    public String getLogId() {
+        return logId;
+    }
+    
+    public boolean getLogToShow() {
+        return logToShow;
+    }
+    
+    public String getActionUrl() {
+        return actionUrl;
+    }
+    
+    public String getLogMessage() {
+        return logMessage;
+    }
+    
+    public long getLogTime() {
+        return logTime;
+    }
+    
+    public long getActionTimeTaken() {
+        return actionTimeTaken;
+    }
+    
+    public String getActionServletName() {
+        return actionServletName;
+    }
+    
+    public String getActionName() {
+        return actionName;
+    }
+    
+    public String getUserRole() {
+        return userRole;
+    }
+    
+    public boolean isMasqueradeUserRole() {
+        return isMasqueradeUserRole;
+    }
+    
+    public String getUserName() {
+        return userName;
+    }
+    
+    public String getUserGoogleId() {
+        return userGoogleId;
+    }
+    
+    public String getUserEmail() {
+        return userEmail;
+    }
+    
+    public boolean isTestingData() {
+        return userEmail.endsWith(Const.ActivityLog.TESTING_DATA_EMAIL_POSTFIX);
+    }
+    
+    // ------------- UI part -------------
+    
+    public String getIconRoleForShow() {
+        StringBuilder iconRole = new StringBuilder(100);
+        
+        if (userRole.contains("Instructor")) {
+            iconRole.append("<span class = \"glyphicon glyphicon-user\" style=\"color:#39b3d7;\"></span>");
+            if (isMasqueradeUserRole()) {
+                iconRole.append("-<span class = \"glyphicon glyphicon-eye-open\" style=\"color:#E61E1E;\"></span>- ");
+            }
+        } else if (userRole.contains("Student")) {
+            iconRole.append("<span class = \"glyphicon glyphicon-user\" style=\"color:#FFBB13;\"></span>");
+            if (isMasqueradeUserRole()) {
+                iconRole.append("-<span class = \"glyphicon glyphicon-eye-open\" style=\"color:#E61E1E;\"></span>- ");
+            }
+        } else if (userRole.contains("Unregistered")) {
+            iconRole.append("<span class = \"glyphicon glyphicon-user\"></span>");
+        } else if (userRole.contains("Auto")) {
+            iconRole.append("<span class = \"glyphicon glyphicon-cog\"></span>");
+        } else {
+            iconRole.append(userRole);
+        }
 
+        if (userRole.contains("Admin")) {
+            iconRole.append("<span class = \"glyphicon glyphicon-user\" style=\"color:#E61E1E;\"></span>");
+        }
+
+        return iconRole.toString();
+    }
+    
     public String getDateInfo() {
         Calendar appCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone(Const.SystemParams.ADMIN_TIME_ZONE));
-        appCal.setTimeInMillis(time);
+        appCal.setTimeInMillis(logTime);
 
         return sdf.format(appCal.getTime());
     }
     
     public String getPersonInfo() {
-        if (url.contains("/student")) {
-            if (googleId.contentEquals("Unregistered")) {
-                return "[" + name
+        if (actionUrl.contains("/student")) {
+            if (userGoogleId.contentEquals("Unregistered")) {
+                return "[" + userName
                         + " (Unregistered User) "
-                        + " <a href=\"mailto:" + email + "\" target=\"_blank\">" + email + "</a>]";
+                        + " <a href=\"mailto:" + userEmail + "\" target=\"_blank\">" + userEmail + "</a>]";
             }
-            return "[" + name
-                    + " <a href=\"" + getStudentHomePageViewLink(googleId) + "\" target=\"_blank\">" + googleId + "</a>"
-                    + " <a href=\"mailto:" + email + "\" target=\"_blank\">" + email + "</a>]";
-        } else if (url.contains("/instructor")) {
-            return "[" + name
-                    + " <a href=\"" + getInstructorHomePageViewLink(googleId) + "\" target=\"_blank\">" + googleId + "</a>"
-                    + " <a href=\"mailto:" + email + "\" target=\"_blank\">" + email + "</a>]";
+            return "[" + userName
+                    + " <a href=\"" + getStudentHomePageViewLink(userGoogleId) + "\" target=\"_blank\">"
+                    + userGoogleId + "</a>"
+                    + " <a href=\"mailto:" + userEmail + "\" target=\"_blank\">" + userEmail + "</a>]";
+        } else if (actionUrl.contains("/instructor")) {
+            return "[" + userName
+                    + " <a href=\"" + getInstructorHomePageViewLink(userGoogleId) + "\" target=\"_blank\">"
+                    + userGoogleId + "</a>"
+                    + " <a href=\"mailto:" + userEmail + "\" target=\"_blank\">" + userEmail + "</a>]";
         } else {
-            return googleId;
+            return userGoogleId;
         }
     }
     
     public String getActionInfo() {
         String style = "";
         
-        if (message.toLowerCase().contains(Const.ACTION_RESULT_FAILURE.toLowerCase())
-                || message.toLowerCase().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT.toLowerCase())) {
+        if (logMessage.toLowerCase().contains(Const.ACTION_RESULT_FAILURE.toLowerCase())
+                || logMessage.toLowerCase().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT.toLowerCase())) {
             style = "text-danger";
         } else {
             style = "text-success bold";
         }
-        return "<a href=\"" + getUrlToShow() + "\" class=\"" + style + "\" target=\"_blank\">" + servletName + "</a>";
+        return "<a href=\"" + getUrlToShow() + "\" class=\"" + style + "\" target=\"_blank\">" + actionServletName + "</a>";
     }
     
     public String getMessageInfo() {
         
-        if (message.toLowerCase().contains(Const.ACTION_RESULT_FAILURE.toLowerCase())) {
-            message = message.replace(Const.ACTION_RESULT_FAILURE, "<span class=\"text-danger\"><strong>"
+        if (logMessage.toLowerCase().contains(Const.ACTION_RESULT_FAILURE.toLowerCase())) {
+            logMessage = logMessage.replace(Const.ACTION_RESULT_FAILURE, "<span class=\"text-danger\"><strong>"
                       + Const.ACTION_RESULT_FAILURE + "</strong><br>");
-            message = message + "</span><br>";
-        } else if (message.toLowerCase().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT.toLowerCase())) {
-            message = message.replace(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT, "<span class=\"text-danger\"><strong>"
+            logMessage = logMessage + "</span><br>";
+        } else if (logMessage.toLowerCase().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT.toLowerCase())) {
+            logMessage = logMessage.replace(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT, "<span class=\"text-danger\"><strong>"
                       + Const.ACTION_RESULT_SYSTEM_ERROR_REPORT + "</strong><br>");
-            message = message + "</span><br>";
+            logMessage = logMessage + "</span><br>";
         }
                 
-        return message;
+        return logMessage;
     }
 
     public String getColorCode(Long timeTaken) {
@@ -390,29 +270,25 @@ public class ActivityLogEntry {
     public String getLogEntryActionsButtonClass() {
         
         String className = "";
-        if (message.toLowerCase().contains(Const.ACTION_RESULT_FAILURE.toLowerCase())) {
+        if (logMessage.toLowerCase().contains(Const.ACTION_RESULT_FAILURE.toLowerCase())) {
             className = "btn-warning";
-        } else if (message.toLowerCase().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT.toLowerCase())) {
+        } else if (logMessage.toLowerCase().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT.toLowerCase())) {
             className = "btn-danger";
         } else {
             className = "btn-info";
         }
         return className;
     }
-
+    
     public String getUrlToShow() {
-        if (url.contains("user=")) {
-            return url;
+        if (actionUrl.contains("user=")) {
+            return actionUrl;
         }
         // If not in masquerade mode, add masquerade mode
-        if (url.contains("?")) {
-            return url + "&user=" + googleId;
+        if (actionUrl.contains("?")) {
+            return actionUrl + "&user=" + userGoogleId;
         }
-        return url + "?user=" + googleId;
-    }
-    
-    public String getId() {
-        return id;
+        return actionUrl + "?user=" + userGoogleId;
     }
     
     public void setKeyStringsToHighlight(String[] strings) {
@@ -420,127 +296,11 @@ public class ActivityLogEntry {
     }
     
     public boolean toShow() {
-        return toShow;
+        return logToShow;
     }
     
     public void setToShow(boolean toShow) {
-        this.toShow = toShow;
-    }
-    
-    public long getTime() {
-        return time;
-    }
-    
-    public String getServletName() {
-        return servletName;
-    }
-    
-    public String getAction() {
-        return action;
-    }
-    
-    public String getRole() {
-        return role;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    public String getGoogleId() {
-        return googleId;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public Long getTimeTaken() {
-        
-        return timeTaken;
-    }
-    
-    /**
-     * Generates the ID for the log. If the googleId is unknown or unregistered,
-     * the email and course of the {@code student} will be used to construct the id.
-     * @param googleId the google ID
-     * @param student StudentAttributes object
-     * @return log ID
-     */
-    public String generateLogId(String googleId, StudentAttributes student, long time) {
-        return student == null ? generateLogId(googleId, null, null, time)
-                               : generateLogId(googleId, student.email, student.course, time);
-    }
-    
-    /**
-     * Generates the ID for the log. If the googleId is unknown or unregistered,
-     * the {@code email} and {@code course} will be used to construct the id.
-     * @param googleId the google ID
-     * @param email the email
-     * @param course the course
-     * @return log ID
-     */
-    public String generateLogId(String googleId, String email, String course, long time) {
-        boolean isUnregisteredStudent = (googleId.contentEquals("Unknown") || googleId.contentEquals("Unregistered"))
-                                        && email != null && course != null;
-        
-        return isUnregisteredStudent ? email + "%" + course + "%" + formatTimeForId(new Date(time))
-                                     : googleId + "%" + formatTimeForId(new Date(time));
-    }
-    
-    public static String generateServletActionFailureLogMessage(HttpServletRequest req, Exception e, UserType userType) {
-        String[] actionTaken = req.getServletPath().split("/");
-        String action = req.getServletPath();
-        if (actionTaken.length > 0) {
-            action = actionTaken[actionTaken.length - 1]; //retrieve last segment in path
-        }
-        String url = HttpRequestHelper.getRequestedUrl(req);
-        
-        String message = "<span class=\"text-danger\">Servlet Action failure in " + action + "<br>"
-                       + e.getClass() + ": " + TeammatesException.toStringWithStackTrace(e) + "<br>"
-                       + HttpRequestHelper.printRequestParameters(req) + "</span>";
-        
-        String courseId = HttpRequestHelper.getValueFromRequestParameterMap(req, Const.ParamsNames.COURSE_ID);
-        String studentEmail = HttpRequestHelper.getValueFromRequestParameterMap(req, Const.ParamsNames.STUDENT_EMAIL);
-        ActivityLogEntry exceptionLog = new ActivityLogEntry(action, Const.ACTION_RESULT_FAILURE, null, message,
-                                                             url, courseId, studentEmail, userType);
-        
-        return exceptionLog.generateLogMessage();
-    }
-
-    public static String generateSystemErrorReportLogMessage(HttpServletRequest req, EmailWrapper errorEmail,
-                                                             UserType userType) {
-        String[] actionTaken = req.getServletPath().split("/");
-        String action = req.getServletPath();
-        if (actionTaken.length > 0) {
-            action = actionTaken[actionTaken.length - 1]; //retrieve last segment in path
-        }
-        String url = HttpRequestHelper.getRequestedUrl(req);
-        
-        String message;
-        
-        try {
-            message = "<span class=\"text-danger\">" + errorEmail.getSubject() + "</span>"
-                    + "<br>"
-                    + "<a href=\"#\" onclick=\"showHideErrorMessage('error" + errorEmail.hashCode() + "');\">"
-                        + "Show/Hide Details >>"
-                    + "</a>"
-                    + "<br>"
-                    + "<span id=\"error" + errorEmail.hashCode() + "\" style=\"display: none;\">"
-                        + errorEmail.getContent()
-                    + "</span>";
-        } catch (Exception e) {
-            message = "System Error: Unable to retrieve Email Report: "
-                    + TeammatesException.toStringWithStackTrace(e);
-        }
-        
-        String courseId = HttpRequestHelper.getValueFromRequestParameterMap(req, Const.ParamsNames.COURSE_ID);
-        String studentEmail = HttpRequestHelper.getValueFromRequestParameterMap(req, Const.ParamsNames.STUDENT_EMAIL);
-        
-        ActivityLogEntry emailReportLog = new ActivityLogEntry(action, Const.ACTION_RESULT_SYSTEM_ERROR_REPORT, null,
-                                                               message, url, courseId, studentEmail, userType);
-        
-        return emailReportLog.generateLogMessage();
+        this.logToShow = toShow;
     }
     
     private String getInstructorHomePageViewLink(String googleId) {
@@ -554,23 +314,24 @@ public class ActivityLogEntry {
         link = Url.addParamToUrl(link, Const.ParamsNames.USER_ID, googleId);
         return link;
     }
-
+    
     public String getLogInfoForTableRowAsHtml() {
         return "<tr" + (isFirstRow ? " id=\"first-row\"" : "") + ">"
-                 + "<td class=\"" + getTableCellColorCode(timeTaken) + "\" style=\"vertical-align: middle;\">"
-                     + "<a onclick=\"submitLocalTimeAjaxRequest('" + time + "','" + googleId + "','" + role + "',this);\">"
+                 + "<td class=\"" + getTableCellColorCode(actionTimeTaken) + "\" style=\"vertical-align: middle;\">"
+                     + "<a onclick=\"submitLocalTimeAjaxRequest('" + logTime + "','"
+                                 + userGoogleId + "','" + userRole + "',this);\">"
                          + getDateInfo()
                      + "</a>"
                      + "<p class=\"localTime\"></p>"
-                     + "<p class=\"" + getColorCode(getTimeTaken()) + "\">"
-                         + "<strong>" + TimeHelper.convertToStandardDuration(getTimeTaken()) + "</strong>"
+                     + "<p class=\"" + getColorCode(getActionTimeTaken()) + "\">"
+                         + "<strong>" + TimeHelper.convertToStandardDuration(getActionTimeTaken()) + "</strong>"
                      + "</p>"
                  + "</td>"
-                 + "<td class=\"" + getTableCellColorCode(timeTaken) + "\">"
+                 + "<td class=\"" + getTableCellColorCode(actionTimeTaken) + "\">"
                      + "<form method=\"get\" action=\"" + Const.ActionURIs.ADMIN_ACTIVITY_LOG_PAGE + "\">"
                          + "<h4 class=\"list-group-item-heading\">"
                              + getIconRoleForShow() + "&nbsp;" + getActionInfo() + "&nbsp;"
-                             + "<small> id:" + id + " " + getPersonInfo() + "</small>" + "&nbsp;"
+                             + "<small> id:" + logId + " " + getPersonInfo() + "</small>" + "&nbsp;"
                              + "<button type=\"submit\" class=\"btn " + getLogEntryActionsButtonClass() + " btn-xs\">"
                                  + "<span class=\"glyphicon glyphicon-zoom-in\"></span>"
                              + "</button>"
@@ -588,14 +349,14 @@ public class ActivityLogEntry {
     }
     
     private String getAvailableIdenficationString() {
-        if (!getGoogleId().contentEquals("Unregistered") && !getGoogleId().contentEquals("Unknown")) {
-            return getGoogleId();
+        if (!getUserGoogleId().contentEquals("Unregistered") && !getUserGoogleId().contentEquals("Unknown")) {
+            return getUserGoogleId();
         }
-        if (getEmail() != null && !getEmail().contentEquals("Unknown")) {
-            return getEmail();
+        if (getUserEmail() != null && !getUserEmail().contentEquals("Unknown")) {
+            return getUserEmail();
         }
-        if (getName() != null && !getName().contentEquals("Unknown")) {
-            return getName();
+        if (getUserName() != null && !getUserName().contentEquals("Unknown")) {
+            return getUserName();
         }
         return "";
     }
@@ -607,16 +368,14 @@ public class ActivityLogEntry {
         }
         
         for (String stringToHighlight : keyStringsToHighlight) {
-            if (message.toLowerCase().contains(stringToHighlight.toLowerCase())) {
+            if (logMessage.toLowerCase().contains(stringToHighlight.toLowerCase())) {
                 
-                int startIndex = message.toLowerCase().indexOf(stringToHighlight.toLowerCase());
+                int startIndex = logMessage.toLowerCase().indexOf(stringToHighlight.toLowerCase());
                 int endIndex = startIndex + stringToHighlight.length();
-                String realStringToHighlight = message.substring(startIndex, endIndex);
-                message = message.replace(realStringToHighlight, "<mark>" + realStringToHighlight + "</mark>");
+                String realStringToHighlight = logMessage.substring(startIndex, endIndex);
+                logMessage = logMessage.replace(realStringToHighlight, "<mark>" + realStringToHighlight + "</mark>");
             }
         }
-        
-        logInfoAsHtml = getLogInfoForTableRowAsHtml();
         
     }
     
@@ -624,8 +383,85 @@ public class ActivityLogEntry {
         isFirstRow = true;
     }
     
-    public boolean isTestingData() {
-        return email.endsWith(".tmt");
+    public static class Builder {
+        // Required parameters
+        private String actionServletName;
+        private String actionUrl;
+        private long logTime;
+        
+        // Optional parameters - initialized to default values
+        private String actionName = Const.ActivityLog.UNKNOWN;
+        private long actionTimeTaken;
+        private String userRole = Const.ActivityLog.UNKNOWN;
+        private String userName = Const.ActivityLog.UNKNOWN;
+        private String userGoogleId = Const.ActivityLog.UNKNOWN;
+        private String userEmail = Const.ActivityLog.UNKNOWN;
+        private String logMessage = Const.ActivityLog.UNKNOWN;
+        private String logId = Const.ActivityLog.UNKNOWN;
+        private boolean isMasqueradeUserRole;
+        
+        public Builder(String servletName, String url, long time) {
+            actionServletName = servletName;
+            actionUrl = url;
+            logTime = time;
+        }
+        
+        public Builder withActionName(String val) {
+            actionName = val;
+            return this;
+        }
+        
+        public Builder withUserRole(String val) {
+            userRole = val;
+            return this;
+        }
+        
+        public Builder withUserName(String val) {
+            userName = val;
+            return this;
+        }
+        
+        public Builder withUserGoogleId(String val) {
+            userGoogleId = val;
+            return this;
+        }
+        
+        public Builder withUserEmail(String val) {
+            userEmail = val;
+            return this;
+        }
+        
+        public Builder withMasqueradeUserRole(Boolean val) {
+            isMasqueradeUserRole = val;
+            return this;
+        }
+        
+        public Builder withLogId(String val) {
+            logId = val;
+            return this;
+        }
+        
+        public Builder withLogMessage(String val) {
+            logMessage = val;
+            return this;
+        }
+        
+        public Builder withActionTimeTaken(long val) {
+            actionTimeTaken = val;
+            return this;
+        }
+        
+        public long getLogTime() {
+            return logTime;
+        }
+        
+        public String getActionServletName() {
+            return actionServletName;
+        }
+        
+        public ActivityLogEntry build() {
+            return new ActivityLogEntry(this);
+        }
     }
 
 }

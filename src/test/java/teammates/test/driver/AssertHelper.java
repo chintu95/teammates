@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import teammates.common.util.ActivityLogEntry;
+import teammates.common.util.Const;
 import teammates.common.util.TimeHelper;
 
 import com.google.appengine.labs.repackaged.com.google.common.base.Joiner;
@@ -136,7 +137,7 @@ public final class AssertHelper {
      * @param actual
      */
     public static void assertLogMessageEquals(String expected, String actual) {
-        String expectedGoogleId = expected.split("\\|\\|\\|")[ActivityLogEntry.POSITION_OF_GOOGLEID];
+        String expectedGoogleId = expected.split("\\|\\|\\|")[ActivityLogEntry.POSITION_OF_USER_GOOGLEID];
 
         assertLogMessageEquals(expected, actual, expectedGoogleId);
     }
@@ -147,10 +148,13 @@ public final class AssertHelper {
         
         assertEquals(expected, actualLogWithoutId);
         
-        String actualId = actual.substring(endIndex + "|||".length());
-        assertTrue("expected actual message's id to contain " + userIdentifier
-                   + " but was " + actualId,
-                   actualId.contains(userIdentifier));
+        // only google login user will have identifier contained in id
+        if (!Const.ActivityLog.AUTH_UNLOGIN.contains(userIdentifier)) {
+            String actualId = actual.substring(endIndex + "|||".length());
+            assertTrue("expected actual message's id to contain " + userIdentifier
+                       + " but was " + actualId,
+                       actualId.contains(userIdentifier));
+        }
     }
     
     public static void assertLogMessageEqualsForUnregisteredStudentUser(

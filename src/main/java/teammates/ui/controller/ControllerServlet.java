@@ -3,6 +3,7 @@ package teammates.ui.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ import teammates.common.exception.FeedbackSessionNotVisibleException;
 import teammates.common.exception.NullPostParameterException;
 import teammates.common.exception.PageNotFoundException;
 import teammates.common.exception.UnauthorizedAccessException;
-import teammates.common.util.ActivityLogEntry;
+import teammates.common.util.ActivityLogGenerator;
 import teammates.common.util.Const;
 import teammates.common.util.EmailWrapper;
 import teammates.common.util.HttpRequestHelper;
@@ -48,6 +49,8 @@ public class ControllerServlet extends HttpServlet {
     public final void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         
         UserType userType = new GateKeeper().getCurrentUser();
+        String url = HttpRequestHelper.getRequestedUrl(req);
+        Map<String, String[]> params = HttpRequestHelper.getParameterMap(req);
 
         try {
             /* We are using the Template Method Design Pattern here.
@@ -75,22 +78,26 @@ public class ControllerServlet extends HttpServlet {
             log.info(c.getLogMessage() + "|||" + timeTaken);
             
         } catch (PageNotFoundException e) {
-            log.warning(ActivityLogEntry.generateServletActionFailureLogMessage(req, e, userType));
+            log.warning(new ActivityLogGenerator()
+                                .generateServletActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             resp.sendRedirect(Const.ViewURIs.ACTION_NOT_FOUND_PAGE);
         } catch (EntityNotFoundException e) {
-            log.warning(ActivityLogEntry.generateServletActionFailureLogMessage(req, e, userType));
+            log.warning(new ActivityLogGenerator()
+                                .generateServletActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             resp.sendRedirect(Const.ViewURIs.ENTITY_NOT_FOUND_PAGE);
 
         } catch (FeedbackSessionNotVisibleException e) {
-            log.warning(ActivityLogEntry.generateServletActionFailureLogMessage(req, e, userType));
+            log.warning(new ActivityLogGenerator()
+                                .generateServletActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             req.getSession().setAttribute(Const.ParamsNames.FEEDBACK_SESSION_NOT_VISIBLE, e.getStartTimeString());
             resp.sendRedirect(Const.ViewURIs.FEEDBACK_SESSION_NOT_VISIBLE);
             
         } catch (UnauthorizedAccessException e) {
-            log.warning(ActivityLogEntry.generateServletActionFailureLogMessage(req, e, userType));
+            log.warning(new ActivityLogGenerator()
+                                .generateServletActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             resp.sendRedirect(Const.ViewURIs.UNAUTHORIZED);
 
@@ -135,7 +142,8 @@ public class ControllerServlet extends HttpServlet {
                                                                   requestUrl, requestParams, userType, t);
             new EmailSender().sendReport(errorReport);
             if (errorReport != null) {
-                log.severe(ActivityLogEntry.generateSystemErrorReportLogMessage(req, errorReport, userType));
+                log.severe(new ActivityLogGenerator().generateSystemErrorReportLogMessage(url, params,
+                                                                        errorReport, userType));
             }
             
             cleanUpStatusMessageInSession(req);
