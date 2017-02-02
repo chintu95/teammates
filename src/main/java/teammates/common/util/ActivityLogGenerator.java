@@ -301,8 +301,8 @@ public class ActivityLogGenerator {
         ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(Const.ActivityLog.UNKNOWN,
                                                     Const.ActivityLog.UNKNOWN, appLog.getTimeUsec());
         // TODO : can use template here
-        String logMessage = "<span class=\"text-danger\">Error. Problem parsing log message from the server.</span><br>"
-                + "System Error: " + e.getMessage() + "<br>" + appLog.getLogMessage();
+        String logMessage = "<span class=\"text-danger\">" + Const.ActivityLog.MESSAGE_ERROR_LOGMESSAGE_FORMAT
+                    + "</span><br>System Error: " + e.getMessage() + "<br>" + appLog.getLogMessage();
         builder.withLogMessage(logMessage);
         return builder.build();
     }
@@ -326,16 +326,13 @@ public class ActivityLogGenerator {
                 tokens[ActivityLogEntry.POSITION_OF_USER_ROLE]
                         .replace(Const.ActivityLog.MASQUERADE_ROLE_POSTFIX, ""));
         
-        boolean isLogWithTimeTakenAndId = tokens.length > ActivityLogEntry.POSITION_OF_LOG_ID + 1;
-        if (isLogWithTimeTakenAndId) {
-            try {
-                long actionTimeTaken = tokens.length == ActivityLogEntry.POSITION_OF_LOG_TIMETAKEN + 1
-                                                ? Long.parseLong(tokens[ActivityLogEntry.POSITION_OF_LOG_TIMETAKEN].trim())
-                                                : 0;
-                builder.withActionTimeTaken(actionTimeTaken);
-            } catch (NumberFormatException e) {
-                log.severe(String.format(Const.ActivityLog.MESSAGE_ERROR_LOGMESSAGE_FORMAT, Arrays.toString(tokens)));
-            }
+        try {
+            long actionTimeTaken = tokens.length == ActivityLogEntry.POSITION_OF_LOG_TIMETAKEN + 1
+                                            ? Long.parseLong(tokens[ActivityLogEntry.POSITION_OF_LOG_TIMETAKEN].trim())
+                                            : 0;
+            builder.withActionTimeTaken(actionTimeTaken);
+        } catch (NumberFormatException e) {
+            log.severe(String.format(Const.ActivityLog.MESSAGE_ERROR_LOGMESSAGE_FORMAT, Arrays.toString(tokens)));
         }
 
         return builder.build();

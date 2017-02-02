@@ -229,13 +229,31 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
     
     @Test
     public void testGenerateActivityLogFromAppLogLine() {
+        ______TS("Success: Generate activityLog from appLogLine (with TimeTaken)");
         String logMessageWithoutTimeTaken = "TEAMMATESLOG|||instructorHome|||Pageload|||true|||Instructor"
                     + "|||UserName|||UserId|||UserEmail|||Message|||URL|||UserId20151019143729608";
         AppLogLine appLog = new AppLogLine();
-        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPERATOR + "20"); // with TimeTaken
+        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPERATOR + "20");
         ActivityLogEntry entry = logCenter.generateActivityLogFromAppLogLine(appLog);
         assertEquals(logMessageWithoutTimeTaken, entry.generateLogMessage());
         assertEquals(20, entry.getActionTimeTaken());
+        
+        ______TS("Success: Generate activityLog from appLogLine (without TimeTaken)");
+        appLog.setLogMessage(logMessageWithoutTimeTaken);
+        entry = logCenter.generateActivityLogFromAppLogLine(appLog);
+        assertEquals(logMessageWithoutTimeTaken, entry.generateLogMessage());
+        assertEquals(0, entry.getActionTimeTaken());
+        
+        ______TS("Success with severe log: timeTaken not in correct format");
+        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPERATOR + "random");
+        entry = logCenter.generateActivityLogFromAppLogLine(appLog);
+        assertEquals(logMessageWithoutTimeTaken, entry.generateLogMessage());
+        assertEquals(0, entry.getActionTimeTaken());
+        
+        ______TS("Fail: log message not in correct format");
+        appLog.setLogMessage("TEAMMATESLOG||RANDOM");
+        entry = logCenter.generateActivityLogFromAppLogLine(appLog);
+        assertTrue(entry.generateLogMessage().contains(Const.ActivityLog.MESSAGE_ERROR_LOGMESSAGE_FORMAT));
     }
     
     private Map<String, String[]> generateMockParamsWithRegKey() {
