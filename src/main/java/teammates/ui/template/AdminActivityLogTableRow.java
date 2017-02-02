@@ -80,7 +80,7 @@ public class AdminActivityLogTableRow {
             switch(action) {
             case Const.ACTION_RESULT_FAILURE:
                 return WARNING;
-            case Const.ACTION_RESULT_SYSTEM_ERROR_REPORT: // fall through
+            case Const.ACTION_RESULT_SYSTEM_ERROR_REPORT:
                 return DANGER;
             default:
                 return NORMAL;
@@ -103,27 +103,21 @@ public class AdminActivityLogTableRow {
         }
         
         public static UserRoleCssClass generateRoleCssClassHelper(String role) {
-            if (role.equals(Const.ActivityLog.ROLE_ADMIN)) {
+            switch(role) {
+            case Const.ActivityLog.ROLE_ADMIN:
                 return ADMIN;
-            }
-            
-            if (role.equals(Const.ActivityLog.ROLE_INSTRUCTOR)) {
+            case Const.ActivityLog.ROLE_INSTRUCTOR:
                 return INSTRUCTOR;
-            }
-            
-            if (role.equals(Const.ActivityLog.ROLE_STUDENT)) {
+            case Const.ActivityLog.ROLE_STUDENT:
                 return STUDENT;
-            }
-            
-            if (role.equals(Const.ActivityLog.ROLE_AUTO)) {
+            case Const.ActivityLog.ROLE_AUTO:
                 return AUTO;
+            default:
+                if (role.contains(Const.ActivityLog.ROLE_UNREGISTERED)) {
+                    return UNREGISTERED;
+                }
+                return UNKNOWN;
             }
-            
-            if (role.contains(Const.ActivityLog.ROLE_UNREGISTERED)) {
-                return UNREGISTERED;
-            }
-            
-            return UNKNOWN;
         }
         
         public String getIconCssClass() {
@@ -165,7 +159,7 @@ public class AdminActivityLogTableRow {
     
     public String getUserIdentity() {
         String googleId = activityLog.getGoogleId();
-        if (!googleId.contentEquals(Const.ActivityLog.AUTH_UNLOGIN)
+        if (!googleId.contentEquals(Const.ActivityLog.AUTH_NOTLOGIN)
                 && !googleId.contentEquals(Const.ActivityLog.UNKNOWN)) {
             return googleId;
         }

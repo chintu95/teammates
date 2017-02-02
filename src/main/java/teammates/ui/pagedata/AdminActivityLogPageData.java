@@ -208,7 +208,7 @@ public class AdminActivityLogPageData extends PageData {
             return false;
         }
         if (q.isCutoffInQuery) {
-            if (logEntry.getTimeTaken() == -1) {
+            if (logEntry.getTimeTaken() == 0) {
                 return false;
             }
             
