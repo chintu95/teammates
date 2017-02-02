@@ -21,6 +21,23 @@ public class ActivityLogEntryTest extends BaseTestCase {
     }
     
     @Test
+    public void testBuilderNullValues() {
+        ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(null, null, 10);
+        builder.withActionName(null)
+               .withLogId(null)
+               .withLogMessage(null)
+               .withUserEmail(null)
+               .withUserGoogleId(null)
+               .withUserName(null)
+               .withUserRole(null);
+        String logMessage = "TEAMMATESLOG|||Unknown|||Unknown|||true|||Unknown|||Unknown|||Unknown"
+                + "|||Unknown|||Unknown|||Unknown";
+        ActivityLogEntry entry = builder.build();
+        AssertHelper.assertLogMessageEquals(logMessage, entry.generateLogMessage());
+        assertEquals(Const.ActivityLog.UNKNOWN, entry.getLogId());
+    }
+    
+    @Test
     public void testBuilder() {
         ______TS("Test generateLogMessage");
         

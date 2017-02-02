@@ -61,16 +61,25 @@ public class ActivityLogEntry {
     
     public ActivityLogEntry(Builder builder) {
         logTime = builder.logTime;
-        actionServletName = builder.actionServletName;
+        actionServletName = (builder.actionServletName == null)
+                          ? Const.ActivityLog.UNKNOWN : builder.actionServletName;
         actionTimeTaken = builder.actionTimeTaken;
-        actionName = builder.actionName;
-        userRole = builder.userRole;
-        userName = builder.userName;
-        userGoogleId = builder.userGoogleId;
-        userEmail = builder.userEmail;
-        logMessage = builder.logMessage;
-        actionUrl = builder.actionUrl;
-        logId = builder.logId;
+        actionName = (builder.actionName == null)
+                   ? Const.ActivityLog.UNKNOWN : builder.actionName;
+        userRole = (builder.userRole == null)
+                 ? Const.ActivityLog.UNKNOWN : builder.userRole;
+        userName = (builder.userName == null)
+                 ? Const.ActivityLog.UNKNOWN : builder.userName;
+        userGoogleId = (builder.userGoogleId == null)
+                     ? Const.ActivityLog.UNKNOWN : builder.userGoogleId;
+        userEmail = (builder.userEmail == null)
+                  ? Const.ActivityLog.UNKNOWN : builder.userEmail;
+        logMessage = (builder.logMessage == null)
+                   ? Const.ActivityLog.UNKNOWN : builder.logMessage;
+        actionUrl = (builder.actionUrl == null)
+                  ? Const.ActivityLog.UNKNOWN : builder.actionUrl;
+        logId = (builder.logId == null)
+              ? Const.ActivityLog.UNKNOWN : builder.logId;
         actionTimeTaken = builder.actionTimeTaken;
         isMasqueradeUserRole = builder.isMasqueradeUserRole;
     }
@@ -383,6 +392,14 @@ public class ActivityLogEntry {
         isFirstRow = true;
     }
     
+    /**
+     * A builder class for {@link ActivityLogEntry}.
+     * <p>
+     * All null values (if possible) that are passed into the builder will be ignored and will be
+     * replaced by {@link Const.ActivityLog.UNKNOWN}
+     * 
+     * @see {@link ActivityLogEntry}
+     */
     public static class Builder {
         // Required parameters
         private String actionServletName;
