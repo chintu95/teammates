@@ -33,7 +33,7 @@
                             </p>
                         </td>
                         <td class="${log.tableCellClass}">
-                            <form method="get" action="${Const.ActionURIs.ADMIN_ACTIVITY_LOG_PAGE}">
+                            <form method="get" action="<%= Const.ActionURIs.ADMIN_ACTIVITY_LOG_PAGE %>">
                                 <h4 class="list-group-item-heading">
                                     <span class="${log.userRoleIconClass}"></span>
                                     <span class="${log.masqueradeUserRoleIconClass}"></span>
