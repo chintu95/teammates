@@ -54,10 +54,10 @@ public abstract class PublicResourcesServlet extends HttpServlet {
     }
     
     protected void logMessage(HttpServletRequest request, String message) {
-        UserType currUser = new GateKeeper().getCurrentUser();
+        UserType userType = new GateKeeper().getCurrentUser();
         String url = HttpRequestHelper.getRequestedUrl(request);
         Map<String, String[]> params = HttpRequestHelper.getParameterMap(request);
         log.warning(new ActivityLogGenerator()
-                        .generateBasicActivityLogMessage(url, params, message, currUser));
+                        .generateBasicActivityLogMessage(url, params, message, userType));
     }
 }
