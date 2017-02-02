@@ -326,7 +326,7 @@ public class ActivityLogGenerator {
                 tokens[ActivityLogEntry.POSITION_OF_USER_ROLE]
                         .replace(Const.ActivityLog.MASQUERADE_ROLE_POSTFIX, ""));
         
-        boolean isLogWithTimeTakenAndId = tokens.length >= ActivityLogEntry.POSITION_OF_LOG_ID + 1;
+        boolean isLogWithTimeTakenAndId = tokens.length > ActivityLogEntry.POSITION_OF_LOG_ID + 1;
         if (isLogWithTimeTakenAndId) {
             try {
                 long actionTimeTaken = tokens.length == ActivityLogEntry.POSITION_OF_LOG_TIMETAKEN + 1
