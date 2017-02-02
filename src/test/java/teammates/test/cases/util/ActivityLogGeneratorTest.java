@@ -103,7 +103,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
         assertTrue(generatedMessage.contains("Auto")); // log id contains auto
         
-        // other situations tested in testGenerateNormalPageActionLogMessage
+        // other situations are tested in testGenerateNormalPageActionLogMessage()
     }
     
     @Test
@@ -127,8 +127,8 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         
         String generatedMessage = logCenter.generateNormalPageActionLogMessage(url, mockParamMap,
                                                                     null, null, null, "Not authorized");
-        AssertHelper.assertLogMessageEquals(logMessage, generatedMessage);
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains course id and email
+        AssertHelper.assertLogMessageEqualsForUnregisteredStudentUser(logMessage, generatedMessage,
+                                                            "student@email.com", "CS2103");
         
         ______TS("Not google login but with key (success)");
         
@@ -137,9 +137,11 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         StudentAttributes student = new StudentAttributes("unknownGoogleId", "student@email", "Joe",
                                             "comments", "CS2103", "team1", "section1");
         
-        AssertHelper.assertLogMessageEquals(logMessage, // auth success will pass unregistered student
-                logCenter.generateNormalPageActionLogMessage(url, mockParamMap, null, null, student, "Join Course"));
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains course id and email
+        // auth success : unregistered student will be passed
+        generatedMessage = logCenter.generateNormalPageActionLogMessage(url, mockParamMap, null, null,
+                                                                        student, "Join Course");
+        AssertHelper.assertLogMessageEqualsForUnregisteredStudentUser(logMessage, generatedMessage,
+                                                            "student@email.com", "CS2103");
         
         // --------------- Google login ---------------
         

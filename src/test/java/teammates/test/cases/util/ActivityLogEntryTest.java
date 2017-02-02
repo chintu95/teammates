@@ -43,7 +43,7 @@ public class ActivityLogEntryTest extends BaseTestCase {
         ActivityLogEntry entry = builder.build();
         AssertHelper.assertLogMessageEquals(logMessage, entry.generateLogMessage());
         
-        ______TS("Test getter");
+        ______TS("Test getters");
         
         assertEquals("instructorHome", entry.getActionServletName());
         assertEquals(Const.ACTION_RESULT_FAILURE, entry.getActionName());

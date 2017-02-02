@@ -137,20 +137,21 @@ public final class AssertHelper {
      * @param actual
      */
     public static void assertLogMessageEquals(String expected, String actual) {
-        String expectedGoogleId = expected.split("\\|\\|\\|")[ActivityLogEntry.POSITION_OF_USER_GOOGLEID];
+        String expectedGoogleId = expected
+                    .split(Pattern.quote(Const.ActivityLog.FIELD_SEPERATOR))[ActivityLogEntry.POSITION_OF_USER_GOOGLEID];
 
         assertLogMessageEquals(expected, actual, expectedGoogleId);
     }
     
     private static void assertLogMessageEquals(String expected, String actual, String userIdentifier) {
-        int endIndex = actual.lastIndexOf("|||");
+        int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPERATOR);
         String actualLogWithoutId = actual.substring(0, endIndex);
         
         assertEquals(expected, actualLogWithoutId);
         
         // only google logged-in user will have identifier(googleId) contained in id
         if (!Const.ActivityLog.AUTH_UNLOGIN.equals(userIdentifier)) {
-            String actualId = actual.substring(endIndex + "|||".length());
+            String actualId = actual.substring(endIndex + Const.ActivityLog.FIELD_SEPERATOR.length());
             assertTrue("expected actual message's id to contain " + userIdentifier
                        + " but was " + actualId,
                        actualId.contains(userIdentifier));
@@ -159,7 +160,7 @@ public final class AssertHelper {
     
     public static void assertLogMessageEqualsForUnregisteredStudentUser(
             String expected, String actual, String studentEmail, String courseId) {
-        assertLogMessageEquals(expected, actual, studentEmail + "%" + courseId);
+        assertLogMessageEquals(expected, actual, studentEmail + Const.ActivityLog.FIELD_CONNECTOR + courseId);
     }
     
     public static void assertSameContentIgnoreOrder(List<?> a, List<?> b) {
