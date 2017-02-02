@@ -1476,6 +1476,8 @@ public final class Const {
         public static final String MASQUERADE_ROLE_POSTFIX = "(M)";
         
         public static final String AUTH_UNLOGIN = "Unregistered";
+
+        public static final String FIELD_SEPERATOR = "|||";
     }
 
 }

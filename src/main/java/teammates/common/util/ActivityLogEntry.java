@@ -254,8 +254,17 @@ public class ActivityLogEntry {
      */
     public String generateLogMessage() {
         //TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||ID
-        return "TEAMMATESLOG|||" + servletName + "|||" + action + "|||" + (toShow ? "true" : "false") + "|||"
-                + role + "|||" + name + "|||" + googleId + "|||" + email + "|||" + message + "|||" + url + "|||" + id;
+        return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPERATOR
+                + servletName + Const.ActivityLog.FIELD_SEPERATOR
+                + action + Const.ActivityLog.FIELD_SEPERATOR
+                + (toShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPERATOR
+                + role + Const.ActivityLog.FIELD_SEPERATOR
+                + name + Const.ActivityLog.FIELD_SEPERATOR
+                + googleId + Const.ActivityLog.FIELD_SEPERATOR
+                + email + Const.ActivityLog.FIELD_SEPERATOR
+                + message + Const.ActivityLog.FIELD_SEPERATOR
+                + url + Const.ActivityLog.FIELD_SEPERATOR
+                + id;
     }
 
     public String getId() {
