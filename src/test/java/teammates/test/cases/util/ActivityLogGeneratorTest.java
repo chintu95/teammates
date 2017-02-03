@@ -96,12 +96,12 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         ______TS("Automated task");
         String url = Const.ActionURIs.AUTOMATED_FEEDBACK_CLOSED_REMINDERS;
         Map<String, String[]> mockParamMap = Maps.newHashMap();
-        String logMessagePrefix = "TEAMMATESLOG|||feedbackSessionClosedReminders|||feedbackSessionClosedReminders|||true"
+        String logMessage = "TEAMMATESLOG|||feedbackSessionClosedReminders|||feedbackSessionClosedReminders|||true"
                 + "|||Auto|||Unknown|||Unknown|||Unknown|||auto task|||/auto/feedbackSessionClosedReminders";
         
         String generatedMessage = logCenter.generateBasicActivityLogMessage(url, mockParamMap, "auto task", null);
-        assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(generatedMessage.contains("Auto")); // log id contains auto
+        AssertHelper.assertLogMessageEquals(logMessage, generatedMessage);
+        assertTrue(generatedMessage.contains("Auto" + Const.ActivityLog.FIELD_CONNECTOR)); // log id contains auto
         
         // other situations are tested in testGenerateNormalPageActionLogMessage()
     }
