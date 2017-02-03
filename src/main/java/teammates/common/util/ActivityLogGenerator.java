@@ -193,7 +193,7 @@ public class ActivityLogGenerator {
             builder.withUserRole(Const.ActivityLog.ROLE_AUTO);
         } else if (currUser == null) {
             builder.withLogId(generateLogIdWithoutGoogleId(params, currTime));
-            builder.withUserGoogleId(Const.ActivityLog.AUTH_NOTLOGIN);
+            builder.withUserGoogleId(Const.ActivityLog.AUTH_NOT_LOGIN);
         } else {
             builder.withLogId(generateLogIdWithGoogleId(currUser.id, currTime));
             builder.withUserGoogleId(currUser.id);
@@ -266,7 +266,7 @@ public class ActivityLogGenerator {
                     + courseId + Const.ActivityLog.FIELD_CONNECTOR
                     + formatTimeForId(new Date(time));
         }
-        return Const.ActivityLog.AUTH_NOTLOGIN + Const.ActivityLog.FIELD_CONNECTOR + formatTimeForId(new Date(time));
+        return Const.ActivityLog.AUTH_NOT_LOGIN + Const.ActivityLog.FIELD_CONNECTOR + formatTimeForId(new Date(time));
     }
     
     private String generateLogIdWithGoogleId(String googleId, long time) {

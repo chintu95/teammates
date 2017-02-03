@@ -150,7 +150,7 @@ public final class AssertHelper {
         assertEquals(expected, actualLogWithoutId);
         
         // only google logged-in user will have identifier(googleId) contained in id
-        if (!Const.ActivityLog.AUTH_NOTLOGIN.equals(userIdentifier)) {
+        if (!Const.ActivityLog.AUTH_NOT_LOGIN.equals(userIdentifier)) {
             String actualId = actual.substring(endIndex + Const.ActivityLog.FIELD_SEPERATOR.length());
             assertTrue("expected actual message's id to contain " + userIdentifier
                        + " but was " + actualId,
