@@ -159,7 +159,7 @@ public class AdminActivityLogTableRow {
     
     public String getUserIdentity() {
         String googleId = activityLog.getGoogleId();
-        if (!googleId.contentEquals(Const.ActivityLog.AUTH_NOTLOGIN)
+        if (!googleId.contentEquals(Const.ActivityLog.AUTH_NOT_LOGIN)
                 && !googleId.contentEquals(Const.ActivityLog.UNKNOWN)) {
             return googleId;
         }
