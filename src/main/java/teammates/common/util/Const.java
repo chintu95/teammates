@@ -1462,6 +1462,7 @@ public final class Const {
                 + "the instructors and tutors.&quot;";
     }
     
+    /* These are constants that may be used in log message */
     public static class ActivityLog {
         public static final String TEAMMATESLOG = "TEAMMATESLOG";
         
