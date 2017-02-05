@@ -15,115 +15,11 @@ public class AdminActivityLogTableRow {
     private static final int TIME_TAKEN_WARNING_UPPER_RANGE = 20000;
     private static final int TIME_TAKEN_DANGER_UPPER_RANGE = 60000;
     
-    private static final String MASQUERADE_ROLE_ICON_CLASS = "glyphicon glyphicon-eye-open text-danger";
-    
     private static final String ACTION_UNSCCUSSFUL_HIGHLIGHTER_FRONT = "<span class=\"text-danger\"><strong>";
     private static final String ACTION_UNSCCUSSFUL_HIGHLIGHTER_BACK = "</strong><span>";
     
     private static final String KEYWORDS_HIGHLIGHTER_FRONT = "<mark>";
     private static final String KEYWORDS_HIGHLIGHTER_BACK = "</mark>";
-    
-    private enum TimeTakenCssClass {
-        NORMAL("", ""),
-        WARNING("warning", "text-warning"),
-        DANGER("danger", "text-danger");
-        
-        private String cellClass;
-        private String textClass;
-        
-        TimeTakenCssClass(String cClass, String tClass) {
-            cellClass = cClass;
-            textClass = tClass;
-        }
-          
-        public String toHtmlTableCellClass() {
-            return cellClass;
-        }
-        
-        public String toHtmlTextClass() {
-            return textClass;
-        }
-        
-        public static TimeTakenCssClass generateTimeTakenEnum(long timeTaken) {
-            if (timeTaken >= TIME_TAKEN_WARNING_LOWER_RANGE && timeTaken <= TIME_TAKEN_WARNING_UPPER_RANGE) {
-                return WARNING;
-            } else if (timeTaken > TIME_TAKEN_WARNING_UPPER_RANGE && timeTaken <= TIME_TAKEN_DANGER_UPPER_RANGE) {
-                return DANGER;
-            } else {
-                return NORMAL;
-            }
-        }
-    }
-    
-    private enum ActionTypeCssClass {
-        NORMAL("btn-info", "text-success bold"),
-        WARNING("btn-warning", "text-danger"),
-        DANGER("btn-danger", "text-dnager");
-        
-        private String buttonClass;
-        private String textClass;
-        
-        ActionTypeCssClass(String cClass, String tClass) {
-            buttonClass = cClass;
-            textClass = tClass;
-        }
-          
-        public String toHtmlButtonClass() {
-            return buttonClass;
-        }
-        
-        public String toHtmlTextClass() {
-            return textClass;
-        }
-        
-        public static ActionTypeCssClass generateActionTypeEnum(String action) {
-            switch(action) {
-            case Const.ACTION_RESULT_FAILURE:
-                return WARNING;
-            case Const.ACTION_RESULT_SYSTEM_ERROR_REPORT:
-                return DANGER;
-            default:
-                return NORMAL;
-            }
-        }
-    }
-    
-    private enum UserRoleCssClass {
-        ADMIN("glyphicon glyphicon-user text-danger"),
-        INSTRUCTOR("glyphicon glyphicon-user text-primary"),
-        STUDENT("glyphicon glyphicon-user text-warning"),
-        AUTO("glyphicon glyphicon-cog"),
-        UNREGISTERED("glyphicon glyphicon-user"),
-        UNKNOWN("");
-        
-        private String iconCssClass;
-        
-        UserRoleCssClass(String className) {
-            iconCssClass = className;
-        }
-        
-        public static UserRoleCssClass generateRoleCssClassHelper(String role) {
-            switch(role) {
-            case Const.ActivityLog.ROLE_ADMIN:
-                return ADMIN;
-            case Const.ActivityLog.ROLE_INSTRUCTOR:
-                return INSTRUCTOR;
-            case Const.ActivityLog.ROLE_STUDENT:
-                return STUDENT;
-            case Const.ActivityLog.ROLE_AUTO:
-                return AUTO;
-            default:
-                if (role.contains(Const.ActivityLog.ROLE_UNREGISTERED)) {
-                    return UNREGISTERED;
-                }
-                return UNKNOWN;
-            }
-        }
-        
-        public String getIconCssClass() {
-            return iconCssClass;
-        }
-    }
     
     private ActivityLogEntry activityLog;
     
@@ -180,34 +76,45 @@ public class AdminActivityLogTableRow {
         return !activityLog.getEmail().contains(Const.ActivityLog.UNKNOWN);
     }
     
-    // --------------- Css Classes of elements ---------------
+    // --------------- 'is' fields to determine css class ---------------
     
-    public String getTableCellClass() {
-        return TimeTakenCssClass.generateTimeTakenEnum(activityLog.getTimeTaken()).toHtmlTableCellClass();
+    public boolean getIsUserAdmin() {
+        return activityLog.getRole().contains(Const.ActivityLog.ROLE_ADMIN);
     }
-
-    public String getTimeTakenClass() {
-        return TimeTakenCssClass.generateTimeTakenEnum(activityLog.getTimeTaken()).toHtmlTextClass();
+    
+    public boolean getIsUserInstructor() {
+        return activityLog.getRole().contains(Const.ActivityLog.ROLE_INSTRUCTOR);
     }
-
-    public String getUserRoleIconClass() {
-        return UserRoleCssClass.generateRoleCssClassHelper(activityLog.getRoleWithoutMasquerade()).getIconCssClass();
+    
+    public boolean getIsUserStudent() {
+        return activityLog.getRole().contains(Const.ActivityLog.ROLE_STUDENT);
     }
-
-    public String getMasqueradeUserRoleIconClass() {
-        if (activityLog.isMasqueradeUserRole()) {
-            return MASQUERADE_ROLE_ICON_CLASS;
-        } else {
-            return "";
-        }
+    
+    public boolean getIsUserAuto() {
+        return activityLog.getRole().contains(Const.ActivityLog.ROLE_AUTO);
     }
-
-    public String getActionTextClass() {
-        return ActionTypeCssClass.generateActionTypeEnum(activityLog.getAction()).toHtmlTextClass();
+    
+    public boolean getIsUserUnregistered() {
+        return activityLog.getRole().contains(Const.ActivityLog.ROLE_UNREGISTERED);
     }
-
-    public String getActionButtonClass() {
-        return ActionTypeCssClass.generateActionTypeEnum(activityLog.getAction()).toHtmlButtonClass();
+    
+    public boolean getIsTimeTakenWarning() {
+        return activityLog.getTimeTaken() >= TIME_TAKEN_WARNING_LOWER_RANGE
+                && activityLog.getTimeTaken() <= TIME_TAKEN_WARNING_UPPER_RANGE;
+    }
+    
+    public boolean getIsTimeTakenDanger() {
+        return activityLog.getTimeTaken() > TIME_TAKEN_WARNING_UPPER_RANGE
+                && activityLog.getTimeTaken() <= TIME_TAKEN_DANGER_UPPER_RANGE;
+        // TODO : check why there is upper range
+    }
+    
+    public boolean getIsActionWarning() {
+        return activityLog.getAction().contains(Const.ACTION_RESULT_FAILURE);
+    }
+    
+    public boolean getIsActionDanger() {
+        return activityLog.getAction().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT);
     }
     
     // --------------- Enhancement to the fields ---------------
@@ -272,6 +179,10 @@ public class AdminActivityLogTableRow {
 
     public String getLogTime() {
         return String.valueOf(activityLog.getTime());
+    }
+    
+    public boolean getIsMasqueradeUserRole() {
+        return activityLog.isMasqueradeUserRole();
     }
     
     // --------------- Helper methods ---------------

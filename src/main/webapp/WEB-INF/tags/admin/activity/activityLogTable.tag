@@ -23,21 +23,45 @@
                 </c:if>
                 <c:forEach items="${logs}" var="log" varStatus="count">
                     <tr id="${count.first ? "first-row" : ""}">
-                        <td class="${log.tableCellClass}">
+                        <td class="${log.isTimeTakenWarning ? "warning" : 
+                        		             log.isTimeTakenDanger ? "danger" : "" }">
                             <a onclick="submitLocalTimeAjaxRequest('${log.logTime}','${log.userGoogleId}','${log.displayedRole}', this);">
                                 ${log.displayedLogTime}
                             </a>
                             <p class="localTime"></p>
-                            <p class="${log.timeTakenClass}">
+                            <p class="${log.isTimeTakenWarning ? "text-warning" : 
+                                             log.isTimeTakenDanger ? "text-danger" : "" }">
                                 <strong>${log.displayedLogTimeTaken}</strong>
                             </p>
                         </td>
-                        <td class="${log.tableCellClass}">
+                        <td class="${log.isTimeTakenWarning ? "warning" : 
+                                             log.isTimeTakenDanger ? "danger" : "" }">
                             <form method="get" action="<%= Const.ActionURIs.ADMIN_ACTIVITY_LOG_PAGE %>">
                                 <h4 class="list-group-item-heading">
-                                    <span class="${log.userRoleIconClass}"></span>
-                                    <span class="${log.masqueradeUserRoleIconClass}"></span>
-                                    <a href="${log.displayedActionUrl}" class="${log.actionTextClass}" target="_blank">
+                                    <c:choose>
+                                        <c:when test="${log.isUserAdmin}">
+                                            <span class="glyphicon glyphicon-user text-danger"></span>
+                                        </c:when>
+                                        <c:when test="${log.isUserInstructor}">
+                                            <span class="glyphicon glyphicon-user text-primary"></span>
+                                        </c:when>
+                                        <c:when test="${log.isUserStudent}">
+                                            <span class="glyphicon glyphicon-user text-warning"></span>
+                                        </c:when>
+                                        <c:when test="${log.isUserAuto}">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </c:when>
+                                        <c:when test="${log.isUserUnregistered}">
+                                            <span class="glyphicon glyphicon-user"></span>
+                                        </c:when>
+                                    </c:choose>
+                                    <c:if test="${log.isMasqueradeUserRole}">
+                                        <span class="glyphicon glyphicon-eye-open text-danger"></span>
+                                    </c:if>
+                                    <a href="${log.displayedActionUrl}" 
+                                       class="${log.isActionWarning || log.isActionDanger 
+                                                    ? "text-danger" : "" }" 
+                                       target="_blank">
                                         ${log.actionName}
                                     </a>
                                     <small>
@@ -55,7 +79,8 @@
                                         <a href="mailto:${log.userEmail}" target="_blank">${log.userEmail}</a>
                                         ]
                                     </small>
-                                    <button type="submit" class="btn btn-xs ${log.actionButtonClass}">
+                                    <button type="submit" class="btn btn-xs ${log.isActionWarning ? "btn-warning" : 
+                                                                                 log.isActionDanger ? "btn-danger" : "btn-info"}">
                                         <span class="glyphicon glyphicon-zoom-in"></span>
                                     </button>
                                     <input type="hidden" name="filterQuery" value="person:${log.userIdentity}">
