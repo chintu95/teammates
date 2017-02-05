@@ -86,10 +86,10 @@ public class AdminActivityLogPageData extends PageData {
         this.logs = new ArrayList<AdminActivityLogTableRow>();
         for (ActivityLogEntry entry : entries) {
             AdminActivityLogTableRow row = new AdminActivityLogTableRow(entry);
-            this.logs.add(row);
             if (q != null && q.isInfoInQuery) {
                 row.setKeyStringsToHighlight(q.infoValues);
             }
+            this.logs.add(row);
         }
     }
     
