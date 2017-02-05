@@ -36,7 +36,7 @@ public class AdminActivityLogTableRow {
     // --------------- Additional generated fields ---------------
     
     public String getUserHomeLink() {
-        switch(activityLog.getRoleWithoutMasquerade()) {
+        switch (activityLog.getRoleWithoutMasquerade()) {
         case Const.ActivityLog.ROLE_STUDENT:
             return Url.addParamToUrl(Const.ActionURIs.STUDENT_HOME_PAGE,
                     Const.ParamsNames.USER_ID, activityLog.getGoogleId());
@@ -44,7 +44,7 @@ public class AdminActivityLogTableRow {
             return Url.addParamToUrl(Const.ActionURIs.INSTRUCTOR_HOME_PAGE,
                     Const.ParamsNames.USER_ID, activityLog.getGoogleId());
         default:
-            return activityLog.getGoogleId();
+            return null;
         }
     }
     
