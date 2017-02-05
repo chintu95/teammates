@@ -184,8 +184,8 @@ public class AdminActivityLogPageData extends PageData {
      * Performs the actual filtering, based on QueryParameters
      * returns false if the logEntry fails the filtering process.
      * <p>
-     * If the queryMessage is null, the function will still return true
-     * and indicate the error.
+     * If the queryMessage is null, the function will return true
+     * and set the queryMessage with error message.
      */
     public boolean filterLogs(ActivityLogEntry logEntry) {
         if (q == null) {
