@@ -72,10 +72,6 @@ public class AdminActivityLogTableRow {
         return "";
     }
     
-    public boolean getHasUserEmail() {
-        return !activityLog.getEmail().contains(Const.ActivityLog.UNKNOWN);
-    }
-    
     // --------------- 'is' fields to determine css class ---------------
     
     public boolean getIsUserAdmin() {
