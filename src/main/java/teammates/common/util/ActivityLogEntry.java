@@ -257,7 +257,7 @@ public class ActivityLogEntry {
         return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPARATOR
                 + servletName + Const.ActivityLog.FIELD_SEPARATOR
                 + action + Const.ActivityLog.FIELD_SEPARATOR
-                + (toShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPARATOR
+                + toShow + Const.ActivityLog.FIELD_SEPARATOR
                 + role + Const.ActivityLog.FIELD_SEPARATOR
                 + name + Const.ActivityLog.FIELD_SEPARATOR
                 + googleId + Const.ActivityLog.FIELD_SEPARATOR
