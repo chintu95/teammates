@@ -160,28 +160,32 @@ public class AdminActivityLogPageData extends PageData {
     }
     
     /**
-     * check current log entry should be excluded as rubbish logs
+     * check current log entry should be included or not.
+     * 
      * returns false if the logEntry is regarded as rubbish
      */
-    private boolean shouldExcludeLogEntry(ActivityLogEntry logEntry) {
+    private boolean shouldIncludeLogEntry(ActivityLogEntry logEntry) {
         
         if (ifShowAll) {
-            return false;
+            return true;
         }
         
         for (String uri : excludedLogRequestURIs) {
             
             if (uri.contains(logEntry.getUrl())) {
-                return true;
+                return false;
             }
         }
         
-        return false;
+        return true;
     }
     
     /**
      * Performs the actual filtering, based on QueryParameters
-     * returns false if the logEntry fails the filtering process
+     * returns false if the logEntry fails the filtering process.
+     * <p>
+     * If the queryMessage is null, the function will still return true
+     * and indicate the error.
      */
     public boolean filterLogs(ActivityLogEntry logEntry) {
         if (q == null) {
@@ -207,14 +211,8 @@ public class AdminActivityLogPageData extends PageData {
         if (q.isRoleInQuery && !arrayContains(q.roleValues, logEntry.getRole())) {
             return false;
         }
-        if (q.isCutoffInQuery) {
-            if (logEntry.getTimeTaken() == 0) {
-                return false;
-            }
-            
-            if (logEntry.getTimeTaken() < q.cutoffValue) {
-                return false;
-            }
+        if (q.isCutoffInQuery && (logEntry.getTimeTaken() == 0 || logEntry.getTimeTaken() < q.cutoffValue)) {
+            return false;
         }
         if (q.isInfoInQuery) {
             
@@ -230,7 +228,7 @@ public class AdminActivityLogPageData extends PageData {
             return false;
         }
         
-        return !shouldExcludeLogEntry(logEntry);
+        return shouldIncludeLogEntry(logEntry);
     }
     
     /**
