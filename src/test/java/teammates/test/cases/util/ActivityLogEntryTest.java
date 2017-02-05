@@ -41,8 +41,7 @@ public class ActivityLogEntryTest extends BaseTestCase {
         appLog.setTimeUsec(0);
         entry = new ActivityLogEntry(appLog);
         
-        assertEquals("instructorHome",
-                     entry.getServletName());
+        assertEquals("instructorHome", entry.getServletName());
         assertEquals(0, entry.getTime());
         assertEquals("Message", entry.getMessage());
         assertEquals("UserId", entry.getGoogleId());
