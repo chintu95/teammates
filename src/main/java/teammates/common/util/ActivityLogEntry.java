@@ -254,16 +254,16 @@ public class ActivityLogEntry {
      */
     public String generateLogMessage() {
         //TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||ID
-        return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPERATOR
-                + servletName + Const.ActivityLog.FIELD_SEPERATOR
-                + action + Const.ActivityLog.FIELD_SEPERATOR
-                + (toShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPERATOR
-                + role + Const.ActivityLog.FIELD_SEPERATOR
-                + name + Const.ActivityLog.FIELD_SEPERATOR
-                + googleId + Const.ActivityLog.FIELD_SEPERATOR
-                + email + Const.ActivityLog.FIELD_SEPERATOR
-                + message + Const.ActivityLog.FIELD_SEPERATOR
-                + url + Const.ActivityLog.FIELD_SEPERATOR
+        return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPARATOR
+                + servletName + Const.ActivityLog.FIELD_SEPARATOR
+                + action + Const.ActivityLog.FIELD_SEPARATOR
+                + (toShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPARATOR
+                + role + Const.ActivityLog.FIELD_SEPARATOR
+                + name + Const.ActivityLog.FIELD_SEPARATOR
+                + googleId + Const.ActivityLog.FIELD_SEPARATOR
+                + email + Const.ActivityLog.FIELD_SEPARATOR
+                + message + Const.ActivityLog.FIELD_SEPARATOR
+                + url + Const.ActivityLog.FIELD_SEPARATOR
                 + id;
     }
 
