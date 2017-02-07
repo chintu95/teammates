@@ -253,7 +253,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         ______TS("Fail: log message not in correct format");
         appLog.setLogMessage("TEAMMATESLOG||RANDOM");
         entry = logCenter.generateActivityLogFromAppLogLine(appLog);
-        assertTrue(entry.generateLogMessage().contains(Const.ActivityLog.MESSAGE_ERROR_LOGMESSAGE_FORMAT));
+        assertTrue(entry.generateLogMessage().contains(Const.ActivityLog.MESSAGE_ERROR_LOG_MESSAGE_FORMAT));
     }
     
     private Map<String, String[]> generateMockParamsWithRegKey() {

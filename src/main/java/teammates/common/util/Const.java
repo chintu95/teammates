@@ -1484,8 +1484,8 @@ public final class Const {
         
         public static final String UNKNOWN = "Unknown";
         
-        public static final String MESSAGE_ERROR_ACTIONNAME = "Error when getting ActionName for requestUrl : %1$s";
-        public static final String MESSAGE_ERROR_LOGMESSAGE_FORMAT = "Log message format not as expected: %1$s";
+        public static final String MESSAGE_ERROR_ACTION_NAME = "Error when getting ActionName for requestUrl : %1$s";
+        public static final String MESSAGE_ERROR_LOG_MESSAGE_FORMAT = "Log message format not as expected: %1$s";
         
         public static final String TIME_FORMAT_LOGID = "yyyyMMddHHmmssSS";
         
