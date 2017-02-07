@@ -38,9 +38,8 @@ public class ActivityLogGenerator {
      * @return log message in form specified in {@link ActivityLogEntry}
      */
     public String generateNormalPageActionLogMessage(String url, Map<String, String[]> params,
-                                                 UserType currUser,
-                                                 AccountAttributes userAccount,
-                                                 StudentAttributes unregisteredStudent, String logMessage) {
+                                                     UserType currUser, AccountAttributes userAccount,
+                                                     StudentAttributes unregisteredStudent, String logMessage) {
         ActivityLogEntry.Builder builder = generateBasicActivityLogEntry(url, params, currUser);
         
         boolean isUnregisteredStudent = unregisteredStudent != null;
@@ -59,7 +58,6 @@ public class ActivityLogGenerator {
                 StudentAttributes unregisteredStudent) {
         String role = Const.ActivityLog.ROLE_UNREGISTERED;
         if (unregisteredStudent.course != null && !unregisteredStudent.course.isEmpty()) {
-            // TODO: diccuss: remove this if necessary as it can be seen in log id
             role = Const.ActivityLog.ROLE_UNREGISTERED + ":" + unregisteredStudent.course;
         }
         builder.withUserRole(role)
@@ -100,7 +98,7 @@ public class ActivityLogGenerator {
     private boolean isInstructorPage(String servletName) {
         return servletName.toLowerCase().startsWith(Const.ActivityLog.PREFIX_INSTRUCTOR_PAGE)
                 || Const.ActionURIs.INSTRUCTOR_FEEDBACK_STATS_PAGE.contains(servletName);
-        // TODO remove this one
+        // TODO rename the special INSTRUCTOR_FEEDBACK_STATS_PAGE to start with instructor
     }
 
     private boolean isStudentPage(String servletName) {
@@ -123,7 +121,6 @@ public class ActivityLogGenerator {
                                                          Exception e, UserType currUser) {
         ActivityLogEntry.Builder builder = generateBasicActivityLogEntry(url, params, currUser);
         
-        // TODO pull out this
         String message = "<span class=\"text-danger\">Servlet Action failure in "
                        + builder.getActionServletName() + "<br>"
                        + e.getClass() + ": " + TeammatesException.toStringWithStackTrace(e) + "<br>"
@@ -131,7 +128,6 @@ public class ActivityLogGenerator {
         builder.withLogMessage(message);
         
         builder.withActionName(Const.ACTION_RESULT_FAILURE);
-        // TODO role is unclear
         
         return builder.build().generateLogMessage();
     }
@@ -167,7 +163,6 @@ public class ActivityLogGenerator {
         }
         
         builder.withActionName(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT);
-        // TODO role is unclear
        
         return builder.build().generateLogMessage();
     }
@@ -182,7 +177,7 @@ public class ActivityLogGenerator {
      * @return ActivityLogEntry.Builder builder with basic information
      */
     private ActivityLogEntry.Builder generateBasicActivityLogEntry(String url, Map<String, String[]> params,
-                                                        UserType currUser) {
+                                                                   UserType currUser) {
         String servletName = getActionNameFromUrl(url);
         long currTime = System.currentTimeMillis();
         ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(servletName, url, currTime);
