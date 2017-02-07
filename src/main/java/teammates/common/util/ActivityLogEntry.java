@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 /** A log entry to describe an action carried out by the app */
-public class ActivityLogEntry {
+public final class ActivityLogEntry {
     // The following constants describe the positions of the attributes
     // in the log message. i.e
     // TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||TIME_TAKEN
@@ -59,7 +59,11 @@ public class ActivityLogEntry {
     
     private String[] keyStringsToHighlight;
     
-    public ActivityLogEntry(Builder builder) {
+    private ActivityLogEntry() {
+        // private constructor to prevent illegal initialization
+    }
+    
+    private ActivityLogEntry(Builder builder) {
         logTime = builder.logTime;
         actionServletName = (builder.actionServletName == null)
                           ? Const.ActivityLog.UNKNOWN : builder.actionServletName;
@@ -476,6 +480,7 @@ public class ActivityLogEntry {
             return actionServletName;
         }
         
+        @SuppressWarnings("PMD.AccessorClassGeneration") // use builder to build the class only
         public ActivityLogEntry build() {
             return new ActivityLogEntry(this);
         }
