@@ -144,7 +144,7 @@ public final class AssertHelper {
         assertLogIdContainUserId(actual, expectedGoogleId);
     }
     
-    private static void assertLogIdContainUserId(String actualMessage, String userIdentifier) {
+    public static void assertLogIdContainUserId(String actualMessage, String userIdentifier) {
         int endIndex = actualMessage.lastIndexOf(Const.ActivityLog.FIELD_SEPARATOR);
         String actualId = actualMessage.substring(endIndex + Const.ActivityLog.FIELD_SEPARATOR.length());
         assertTrue("expected actual message's id to contain " + userIdentifier

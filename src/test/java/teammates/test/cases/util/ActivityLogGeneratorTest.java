@@ -45,7 +45,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         String generatedMessage = logCenter.generateSystemErrorReportLogMessage(url, mockParamMap,
                                                                 errorEmail, loginUser);
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(isGoogleIdContainInLogAndLogId("googleIdABC", generatedMessage));
+        AssertHelper.assertLogIdContainUserId(generatedMessage, "googleIdABC");
         
         ______TS("Without google login (with key)");
         
@@ -60,7 +60,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
                     + "|||Unknown|||Unknown|||Unknown|||";
         
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains courseId and email
+        AssertHelper.assertLogIdContainUserId(generatedMessage, "student@email.com%CS2103");
     }
 
     @Test
@@ -76,7 +76,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         
         String generatedMessage = logCenter.generateServletActionFailureLogMessage(url, mockParamMap, e, loginUser);
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(isGoogleIdContainInLogAndLogId("googleIdABC", generatedMessage));
+        AssertHelper.assertLogIdContainUserId(generatedMessage, "googleIdABC");
         
         ______TS("Without google login (with key)");
         
@@ -88,7 +88,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
                     + "|||Unknown|||Unknown|||Unknown|||Unknown|||";
         
         assertTrue(generatedMessage.startsWith(logMessagePrefix));
-        assertTrue(generatedMessage.contains("student@email.com%CS2103")); // log id contains courseId and email
+        AssertHelper.assertLogIdContainUserId(generatedMessage, "student@email.com%CS2103");
     }
     
     @Test
@@ -269,15 +269,6 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
                 new EmailGenerator().generateSystemErrorEmail("GET", "MAC OS", "/page/somePage",
                                                               "http://example/", "{}", null, t);
         return errorReport;
-    }
-    
-    private boolean isGoogleIdContainInLogAndLogId(String googleId, String generatedMessage) {
-        int googleIdPosition = generatedMessage.indexOf(googleId);
-        if (googleIdPosition == -1) { // check that google id is in 'google id' field
-            return false;
-        }
-        // check that google id is in 'log id' field
-        return generatedMessage.indexOf(googleId, googleIdPosition + 1) != -1;
     }
     
 }
