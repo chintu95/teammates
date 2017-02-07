@@ -1480,7 +1480,7 @@ public final class Const {
         public static final String PREFIX_AUTO_PAGE = "/auto";
         
         public static final String FIELD_CONNECTOR = "%";
-        public static final String FIELD_SEPERATOR = "|||";
+        public static final String FIELD_SEPARATOR = "|||";
         
         public static final String UNKNOWN = "Unknown";
         

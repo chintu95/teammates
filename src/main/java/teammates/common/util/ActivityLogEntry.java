@@ -89,16 +89,16 @@ public class ActivityLogEntry {
      */
     public String generateLogMessage() {
         //TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||ID
-        return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPERATOR
-                + actionServletName + Const.ActivityLog.FIELD_SEPERATOR
-                + actionName + Const.ActivityLog.FIELD_SEPERATOR
-                + (logToShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPERATOR
-                + userRole + (isMasqueradeUserRole ? "(M)" : "") + Const.ActivityLog.FIELD_SEPERATOR
-                + userName + Const.ActivityLog.FIELD_SEPERATOR + userGoogleId
-                + Const.ActivityLog.FIELD_SEPERATOR
-                + userEmail + Const.ActivityLog.FIELD_SEPERATOR
-                + logMessage + Const.ActivityLog.FIELD_SEPERATOR
-                + actionUrl + Const.ActivityLog.FIELD_SEPERATOR
+        return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPARATOR
+                + actionServletName + Const.ActivityLog.FIELD_SEPARATOR
+                + actionName + Const.ActivityLog.FIELD_SEPARATOR
+                + (logToShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPARATOR
+                + userRole + (isMasqueradeUserRole ? "(M)" : "") + Const.ActivityLog.FIELD_SEPARATOR
+                + userName + Const.ActivityLog.FIELD_SEPARATOR + userGoogleId
+                + Const.ActivityLog.FIELD_SEPARATOR
+                + userEmail + Const.ActivityLog.FIELD_SEPARATOR
+                + logMessage + Const.ActivityLog.FIELD_SEPARATOR
+                + actionUrl + Const.ActivityLog.FIELD_SEPARATOR
                 + logId;
     }
     

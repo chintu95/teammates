@@ -290,7 +290,7 @@ public class ActivityLogGenerator {
      */
     public ActivityLogEntry generateActivityLogFromAppLogLine(AppLogLine appLog) {
         try {
-            String[] tokens = appLog.getLogMessage().split(Pattern.quote(Const.ActivityLog.FIELD_SEPERATOR), -1);
+            String[] tokens = appLog.getLogMessage().split(Pattern.quote(Const.ActivityLog.FIELD_SEPARATOR), -1);
             return initActivityLogUsingAppLogMessage(appLog, tokens);
         } catch (ArrayIndexOutOfBoundsException e) {
             return initActivityLogAsFailure(appLog, e);

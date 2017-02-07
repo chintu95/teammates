@@ -138,7 +138,7 @@ public final class AssertHelper {
      */
     public static void assertLogMessageEquals(String expected, String actual) {
         String expectedGoogleId = expected
-                    .split(Pattern.quote(Const.ActivityLog.FIELD_SEPERATOR))[ActivityLogEntry.POSITION_OF_USER_GOOGLEID];
+                    .split(Pattern.quote(Const.ActivityLog.FIELD_SEPARATOR))[ActivityLogEntry.POSITION_OF_USER_GOOGLEID];
 
         assertLogMessageEquals(expected, actual, expectedGoogleId);
     }
@@ -146,15 +146,15 @@ public final class AssertHelper {
     private static void assertLogMessageEquals(String expected, String actual, String userIdentifier) {
         assertLogMessageEqualsWithoutId(expected, actual);
         
-        int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPERATOR);
-        String actualId = actual.substring(endIndex + Const.ActivityLog.FIELD_SEPERATOR.length());
+        int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPARATOR);
+        String actualId = actual.substring(endIndex + Const.ActivityLog.FIELD_SEPARATOR.length());
         assertTrue("expected actual message's id to contain " + userIdentifier
                    + " but was " + actualId,
                    actualId.contains(userIdentifier));
     }
     
     public static void assertLogMessageEqualsWithoutId(String expected, String actual) {
-        int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPERATOR);
+        int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPARATOR);
         String actualLogWithoutId = actual.substring(0, endIndex);
         
         assertEquals(expected, actualLogWithoutId);

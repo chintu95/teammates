@@ -233,7 +233,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         String logMessageWithoutTimeTaken = "TEAMMATESLOG|||instructorHome|||Pageload|||true|||Instructor"
                     + "|||UserName|||UserId|||UserEmail|||Message|||URL|||UserId20151019143729608";
         AppLogLine appLog = new AppLogLine();
-        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPERATOR + "20");
+        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPARATOR + "20");
         ActivityLogEntry entry = logCenter.generateActivityLogFromAppLogLine(appLog);
         assertEquals(logMessageWithoutTimeTaken, entry.generateLogMessage());
         assertEquals(20, entry.getActionTimeTaken());
@@ -245,7 +245,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         assertEquals(0, entry.getActionTimeTaken());
         
         ______TS("Success with severe log: timeTaken not in correct format");
-        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPERATOR + "random");
+        appLog.setLogMessage(logMessageWithoutTimeTaken + Const.ActivityLog.FIELD_SEPARATOR + "random");
         entry = logCenter.generateActivityLogFromAppLogLine(appLog);
         assertEquals(logMessageWithoutTimeTaken, entry.generateLogMessage());
         assertEquals(0, entry.getActionTimeTaken());
