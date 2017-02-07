@@ -192,13 +192,13 @@ public class ActivityLogGenerator {
         } else {
             builder.withLogId(generateLogIdWithGoogleId(currUser.id, currTime));
             builder.withUserGoogleId(currUser.id);
-            updateRoleForNormalUser(builder, currUser);
+            updateRoleForLoggedInUser(builder, currUser);
         }
         
         return builder;
     }
     
-    private void updateRoleForNormalUser(ActivityLogEntry.Builder builder, UserType currUser) {
+    private void updateRoleForLoggedInUser(ActivityLogEntry.Builder builder, UserType currUser) {
         if (currUser.isAdmin) {
             builder.withUserRole(Const.ActivityLog.ROLE_ADMIN);
             degradeRoleToStudentIfNecessary(builder);
