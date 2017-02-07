@@ -144,18 +144,20 @@ public final class AssertHelper {
     }
     
     private static void assertLogMessageEquals(String expected, String actual, String userIdentifier) {
+        assertLogMessageEqualsWithoutId(expected, actual);
+        
+        int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPERATOR);
+        String actualId = actual.substring(endIndex + Const.ActivityLog.FIELD_SEPERATOR.length());
+        assertTrue("expected actual message's id to contain " + userIdentifier
+                   + " but was " + actualId,
+                   actualId.contains(userIdentifier));
+    }
+    
+    public static void assertLogMessageEqualsWithoutId(String expected, String actual) {
         int endIndex = actual.lastIndexOf(Const.ActivityLog.FIELD_SEPERATOR);
         String actualLogWithoutId = actual.substring(0, endIndex);
         
         assertEquals(expected, actualLogWithoutId);
-        
-        // only google logged-in user will have identifier(googleId) contained in id
-        if (!Const.ActivityLog.AUTH_NOT_LOGIN.equals(userIdentifier)) {
-            String actualId = actual.substring(endIndex + Const.ActivityLog.FIELD_SEPERATOR.length());
-            assertTrue("expected actual message's id to contain " + userIdentifier
-                       + " but was " + actualId,
-                       actualId.contains(userIdentifier));
-        }
     }
     
     public static void assertLogMessageEqualsForUnregisteredStudentUser(

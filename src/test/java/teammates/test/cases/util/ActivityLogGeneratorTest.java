@@ -100,7 +100,7 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
                 + "|||Auto|||Unknown|||Unknown|||Unknown|||auto task|||/auto/feedbackSessionClosedReminders";
         
         String generatedMessage = logCenter.generateBasicActivityLogMessage(url, mockParamMap, "auto task", null);
-        AssertHelper.assertLogMessageEquals(logMessage, generatedMessage);
+        AssertHelper.assertLogMessageEqualsWithoutId(logMessage, generatedMessage);
         assertTrue(generatedMessage.contains("Auto" + Const.ActivityLog.FIELD_CONNECTOR)); // log id contains auto
         
         // other situations are tested in testGenerateNormalPageActionLogMessage()
