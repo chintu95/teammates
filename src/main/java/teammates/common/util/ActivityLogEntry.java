@@ -92,7 +92,7 @@ public class ActivityLogEntry {
         return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPARATOR
                 + actionServletName + Const.ActivityLog.FIELD_SEPARATOR
                 + actionName + Const.ActivityLog.FIELD_SEPARATOR
-                + (logToShow ? "true" : "false") + Const.ActivityLog.FIELD_SEPARATOR
+                + logToShow + Const.ActivityLog.FIELD_SEPARATOR
                 + userRole + (isMasqueradeUserRole ? "(M)" : "") + Const.ActivityLog.FIELD_SEPARATOR
                 + userName + Const.ActivityLog.FIELD_SEPARATOR + userGoogleId
                 + Const.ActivityLog.FIELD_SEPARATOR
