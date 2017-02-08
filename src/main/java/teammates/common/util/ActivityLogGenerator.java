@@ -100,12 +100,12 @@ public class ActivityLogGenerator {
         ActivityLogEntry.Builder builder = generateBasicActivityLogEntry(url, params, currUser);
         
         String message = "<span class=\"text-danger\">Servlet Action failure in "
-                       + builder.getActionServletName() + "<br>"
+                       + builder.getActionName() + "<br>"
                        + e.getClass() + ": " + TeammatesException.toStringWithStackTrace(e) + "<br>"
                        + JsonUtils.toJson(params, Map.class) + "</span>";
         builder.withLogMessage(message);
         
-        builder.withActionName(Const.ACTION_RESULT_FAILURE);
+        builder.withActionResponse(Const.ACTION_RESULT_FAILURE);
         
         return builder.build().generateLogMessage();
     }
@@ -140,7 +140,7 @@ public class ActivityLogGenerator {
             builder.withLogMessage(message);
         }
         
-        builder.withActionName(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT);
+        builder.withActionResponse(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT);
        
         return builder.build().generateLogMessage();
     }
@@ -176,12 +176,9 @@ public class ActivityLogGenerator {
      */
     private ActivityLogEntry.Builder generateBasicActivityLogEntry(String url, Map<String, String[]> params,
                                                                    UserType currUser) {
-        String servletName = getActionNameFromUrl(url);
+        String actionName = getActionNameFromUrl(url);
         long currTime = System.currentTimeMillis();
-        ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(servletName, url, currTime);
-        // actionName and servletName will be the same by default.
-        // actionName can be changed later.
-        builder.withActionName(servletName);
+        ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(actionName, url, currTime);
         
         if (isAutomatedAction(url)) {
             builder.withLogId(generateLogIdInAutomatedAction(currTime));
@@ -216,25 +213,25 @@ public class ActivityLogGenerator {
     }
 
     private void degradeRoleToStudentIfNecessary(ActivityLogEntry.Builder builder) {
-        if (isStudentPage(builder.getActionServletName())) {
+        if (isStudentPage(builder.getActionName())) {
             builder.withUserRole(Const.ActivityLog.ROLE_STUDENT);
         }
     }
 
     private void degradeRoleToInstructorIfNecessary(ActivityLogEntry.Builder builder) {
-        if (isInstructorPage(builder.getActionServletName())) {
+        if (isInstructorPage(builder.getActionName())) {
             builder.withUserRole(Const.ActivityLog.ROLE_INSTRUCTOR);
         }
     }
 
-    private boolean isInstructorPage(String servletName) {
-        return servletName.toLowerCase().startsWith(Const.ActivityLog.PREFIX_INSTRUCTOR_PAGE)
-                || Const.ActionURIs.INSTRUCTOR_FEEDBACK_STATS_PAGE.contains(servletName);
+    private boolean isInstructorPage(String actionName) {
+        return actionName.toLowerCase().startsWith(Const.ActivityLog.PREFIX_INSTRUCTOR_PAGE)
+                || Const.ActionURIs.INSTRUCTOR_FEEDBACK_STATS_PAGE.contains(actionName);
         // TODO rename the special INSTRUCTOR_FEEDBACK_STATS_PAGE to start with instructor
     }
 
-    private boolean isStudentPage(String servletName) {
-        return servletName.toLowerCase().startsWith(Const.ActivityLog.PREFIX_STUDENT_PAGE);
+    private boolean isStudentPage(String actionName) {
+        return actionName.toLowerCase().startsWith(Const.ActivityLog.PREFIX_STUDENT_PAGE);
     }
 
     private boolean isAutomatedAction(String url) {
@@ -304,13 +301,13 @@ public class ActivityLogGenerator {
     }
 
     private ActivityLogEntry initActivityLogUsingAppLogMessage(AppLogLine appLog, String[] tokens) {
-        // TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||
-        // MESSAGE(IN HTML)|||URL|||ID|||TIME_TAKEN
+        // TEAMMATESLOG|||ACTION_NAME|||ACTION_RESPONSE|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL
+        // |||MESSAGE(IN HTML)|||URL|||TIME_TAKEN
         ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(
-                                            tokens[ActivityLogEntry.POSITION_OF_ACTION_SERVLETNAME],
+                                            tokens[ActivityLogEntry.POSITION_OF_ACTION_NAME],
                                             tokens[ActivityLogEntry.POSITION_OF_ACTION_URL], appLog.getTimeUsec());
         
-        builder.withActionName(tokens[ActivityLogEntry.POSITION_OF_ACTION_NAME]);
+        builder.withActionResponse(tokens[ActivityLogEntry.POSITION_OF_ACTION_RESPONSE]);
         builder.withLogId(tokens[ActivityLogEntry.POSITION_OF_LOG_ID]);
         builder.withLogMessage(tokens[ActivityLogEntry.POSITION_OF_LOG_MESSAGE]);
         builder.withMasqueradeUserRole(tokens[ActivityLogEntry.POSITION_OF_USER_ROLE]

@@ -8,9 +8,10 @@ import java.util.TimeZone;
 public final class ActivityLogEntry {
     // The following constants describe the positions of the attributes
     // in the log message. i.e
-    // TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||TIME_TAKEN
-    public static final int POSITION_OF_ACTION_SERVLETNAME = 1;
-    public static final int POSITION_OF_ACTION_NAME = 2;
+    // TEAMMATESLOG|||ACTION_NAME|||ACTION_RESPONSE|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL
+    // |||MESSAGE(IN HTML)|||URL|||TIME_TAKEN
+    public static final int POSITION_OF_ACTION_NAME = 1;
+    public static final int POSITION_OF_ACTION_RESPONSE = 2;
     public static final int POSITION_OF_LOG_TOSHOW = 3;
     public static final int POSITION_OF_USER_ROLE = 4;
     public static final int POSITION_OF_USER_NAME = 5;
@@ -33,12 +34,12 @@ public final class ActivityLogEntry {
     //     e.g. bamboo@gmail.tmt%instructor.ema-demo%20151103170618465
     private String logId;
     private long logTime;
-    
-    private String actionServletName;
+    private String actionUrl;
     private String actionName;
     
     // Optional fields
     
+    private String actionResponse;
     private String userRole;
     private boolean isMasqueradeUserRole;
     
@@ -47,8 +48,6 @@ public final class ActivityLogEntry {
     private String userGoogleId;
     
     private String logMessage;
-    
-    private String actionUrl;
     
     private long actionTimeTaken;
     
@@ -65,9 +64,9 @@ public final class ActivityLogEntry {
     
     private ActivityLogEntry(Builder builder) {
         logTime = builder.logTime;
-        actionServletName = builder.actionServletName;
-        actionTimeTaken = builder.actionTimeTaken;
         actionName = builder.actionName;
+        actionTimeTaken = builder.actionTimeTaken;
+        actionResponse = builder.actionResponse;
         userRole = builder.userRole;
         userName = builder.userName;
         userGoogleId = builder.userGoogleId;
@@ -83,10 +82,11 @@ public final class ActivityLogEntry {
      * Generates a log message that will be logged in the server
      */
     public String generateLogMessage() {
-        //TEAMMATESLOG|||SERVLET_NAME|||ACTION|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID|||EMAIL|||MESSAGE(IN HTML)|||URL|||ID
+        // TEAMMATESLOG|||ACTION_NAME|||ACTION_RESPONSE|||TO_SHOW|||ROLE|||NAME|||GOOGLE_ID
+        // |||EMAIL|||MESSAGE(IN HTML)|||URL|||ID
         return Const.ActivityLog.TEAMMATESLOG + Const.ActivityLog.FIELD_SEPARATOR
-                + actionServletName + Const.ActivityLog.FIELD_SEPARATOR
                 + actionName + Const.ActivityLog.FIELD_SEPARATOR
+                + actionResponse + Const.ActivityLog.FIELD_SEPARATOR
                 + logToShow + Const.ActivityLog.FIELD_SEPARATOR
                 + userRole + (isMasqueradeUserRole ? "(M)" : "") + Const.ActivityLog.FIELD_SEPARATOR
                 + userName + Const.ActivityLog.FIELD_SEPARATOR + userGoogleId
@@ -121,12 +121,12 @@ public final class ActivityLogEntry {
         return actionTimeTaken;
     }
     
-    public String getActionServletName() {
-        return actionServletName;
-    }
-    
     public String getActionName() {
         return actionName;
+    }
+    
+    public String getActionResponse() {
+        return actionResponse;
     }
     
     public String getUserRole() {
@@ -222,7 +222,7 @@ public final class ActivityLogEntry {
         } else {
             style = "text-success bold";
         }
-        return "<a href=\"" + getUrlToShow() + "\" class=\"" + style + "\" target=\"_blank\">" + actionServletName + "</a>";
+        return "<a href=\"" + getUrlToShow() + "\" class=\"" + style + "\" target=\"_blank\">" + actionName + "</a>";
     }
     
     public String getMessageInfo() {
@@ -391,18 +391,19 @@ public final class ActivityLogEntry {
      * A builder class for {@link ActivityLogEntry}.
      * <p>
      * All optional fields are initialized to {@link Const.ActivityLog.UNKNOWN}.
+     * Field actionResponse will be initialized to have the same value as actionName.
      * All null values (if possible) that are passed into the builder will be ignored.
      * 
      * @see {@link ActivityLogEntry}
      */
     public static class Builder {
         // Required parameters
-        private String actionServletName;
+        private String actionName;
         private String actionUrl;
         private long logTime;
         
         // Optional parameters - initialized to default values
-        private String actionName = Const.ActivityLog.UNKNOWN;
+        private String actionResponse = Const.ActivityLog.UNKNOWN;
         private long actionTimeTaken;
         private String userRole = Const.ActivityLog.UNKNOWN;
         private String userName = Const.ActivityLog.UNKNOWN;
@@ -412,15 +413,17 @@ public final class ActivityLogEntry {
         private String logId = Const.ActivityLog.UNKNOWN;
         private boolean isMasqueradeUserRole;
         
-        public Builder(String servletName, String url, long time) {
-            actionServletName = servletName == null ? Const.ActivityLog.UNKNOWN : servletName;
+        public Builder(String name, String url, long time) {
+            actionName = name == null ? Const.ActivityLog.UNKNOWN : name;
             actionUrl = url == null ? Const.ActivityLog.UNKNOWN : url;
             logTime = time;
+            
+            actionResponse = actionName;
         }
         
-        public Builder withActionName(String val) {
+        public Builder withActionResponse(String val) {
             if (val != null) {
-                actionName = val;
+                actionResponse = val;
             }
             return this;
         }
@@ -481,8 +484,8 @@ public final class ActivityLogEntry {
             return logTime;
         }
         
-        public String getActionServletName() {
-            return actionServletName;
+        public String getActionName() {
+            return actionName;
         }
         
         @SuppressWarnings("PMD.AccessorClassGeneration") // use builder to build the class only

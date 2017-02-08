@@ -159,7 +159,7 @@ public class AdminActivityLogPageData extends PageData {
         
         for (String uri : excludedLogRequestURIs) {
             
-            if (uri.contains(logEntry.getActionServletName())) {
+            if (uri.contains(logEntry.getActionName())) {
                 return true;
             }
         }
@@ -185,11 +185,11 @@ public class AdminActivityLogPageData extends PageData {
         }
         
         //Filter based on what is in the query
-        if (q.isRequestInQuery && !arrayContains(q.requestValues, logEntry.getActionServletName())) {
+        if (q.isRequestInQuery && !arrayContains(q.requestValues, logEntry.getActionName())) {
             logEntry.setToShow(false);
             return logEntry;
         }
-        if (q.isResponseInQuery && !arrayContains(q.responseValues, logEntry.getActionName())) {
+        if (q.isResponseInQuery && !arrayContains(q.responseValues, logEntry.getActionResponse())) {
             logEntry.setToShow(false);
             return logEntry;
         }

@@ -15,7 +15,7 @@ public class ActivityLogEntryTest extends BaseTestCase {
     @Test
     public void testDefaultSettings() {
         ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder("instructorHome", "URL", 10);
-        String logMessage = "TEAMMATESLOG|||instructorHome|||Unknown|||true|||Unknown|||Unknown|||Unknown"
+        String logMessage = "TEAMMATESLOG|||instructorHome|||instructorHome|||true|||Unknown|||Unknown|||Unknown"
                 + "|||Unknown|||Unknown|||URL";
         AssertHelper.assertLogMessageEquals(logMessage, builder.build().generateLogMessage());
     }
@@ -23,7 +23,7 @@ public class ActivityLogEntryTest extends BaseTestCase {
     @Test
     public void testBuilderNullValues() {
         ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(null, null, 10);
-        builder.withActionName(null)
+        builder.withActionResponse(null)
                .withLogId(null)
                .withLogMessage(null)
                .withUserEmail(null)
@@ -47,7 +47,7 @@ public class ActivityLogEntryTest extends BaseTestCase {
                 + "|||Instructor(M)|||Joe|||GoogleIdA|||instructor@email.tmt"
                 + "|||" + statusToAdmin + "|||url.com";
         ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder("instructorHome", "url.com", 10);
-        builder.withActionName(Const.ACTION_RESULT_FAILURE)
+        builder.withActionResponse(Const.ACTION_RESULT_FAILURE)
                .withUserRole(Const.ActivityLog.ROLE_INSTRUCTOR)
                .withUserName("Joe")
                .withUserGoogleId("GoogleIdA")
@@ -62,8 +62,8 @@ public class ActivityLogEntryTest extends BaseTestCase {
         
         ______TS("Test getters");
         
-        assertEquals("instructorHome", entry.getActionServletName());
-        assertEquals(Const.ACTION_RESULT_FAILURE, entry.getActionName());
+        assertEquals("instructorHome", entry.getActionName());
+        assertEquals(Const.ACTION_RESULT_FAILURE, entry.getActionResponse());
         assertEquals(10, entry.getLogTime());
         assertEquals("url.com", entry.getActionUrl());
         assertEquals("Instructor", entry.getUserRole());
