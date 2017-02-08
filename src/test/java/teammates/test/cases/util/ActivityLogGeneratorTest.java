@@ -132,8 +132,9 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         
         ______TS("Not google login but with key (success)");
         
+        url = Const.ActionURIs.STUDENT_COURSE_JOIN + "?user=test@email.com&course=1";
         logMessage = "TEAMMATESLOG|||studentCourseJoin|||studentCourseJoin|||true|||Unregistered:CS2103|||Joe"
-                            + "|||Unknown|||student@email|||Join Course|||/page/studentCourseJoin";
+                            + "|||Unknown|||student@email|||Join Course|||" + url;
         StudentAttributes student = new StudentAttributes("unknownGoogleId", "student@email", "Joe",
                                             "comments", "CS2103", "team1", "section1");
         
@@ -147,10 +148,10 @@ public class ActivityLogGeneratorTest extends BaseTestCase {
         
         ______TS("Google login (No account)");
         
-        url = Const.ActionURIs.STUDENT_HOME_PAGE;
+        url = Const.ActionURIs.STUDENT_HOME_PAGE + "?course=A&user=test";
         mockParamMap = Maps.newHashMap();
         logMessage = "TEAMMATESLOG|||studentHomePage|||studentHomePage|||true|||Unregistered|||Unknown"
-                + "|||googleId|||Unknown|||Try student home|||/page/studentHomePage";
+                + "|||googleId|||Unknown|||Try student home|||" + url;
         UserType userType = new UserType("googleId");
         
         generatedMessage = logCenter.generateNormalPageActionLogMessage(url, mockParamMap,

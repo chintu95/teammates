@@ -21,7 +21,7 @@ import teammates.common.exception.TeammatesException;
  * @see {@link ActivityLogEntry}
  */
 public class ActivityLogGenerator {
-    public static final Pattern PATTERN_ACTION_NAME = Pattern.compile("/\\S*/(?<actionName>\\S*)");
+    public static final Pattern PATTERN_ACTION_NAME = Pattern.compile("^/\\S+?/(?<actionName>[^\\s\\?]*)");
     public static final String PATTERN_ACTION_NAME_GROUP = "actionName";
     
     private static final Logger log = Logger.getLogger();
@@ -240,7 +240,7 @@ public class ActivityLogGenerator {
 
     private String getActionNameFromUrl(String requestUrl) {
         Matcher m = PATTERN_ACTION_NAME.matcher(requestUrl);
-        if (m.matches()) {
+        if (m.find()) {
             return m.group(PATTERN_ACTION_NAME_GROUP);
         } else {
             return String.format(Const.ActivityLog.MESSAGE_ERROR_ACTION_NAME, requestUrl);
