@@ -65,25 +65,16 @@ public final class ActivityLogEntry {
     
     private ActivityLogEntry(Builder builder) {
         logTime = builder.logTime;
-        actionServletName = (builder.actionServletName == null)
-                          ? Const.ActivityLog.UNKNOWN : builder.actionServletName;
+        actionServletName = builder.actionServletName;
         actionTimeTaken = builder.actionTimeTaken;
-        actionName = (builder.actionName == null)
-                   ? Const.ActivityLog.UNKNOWN : builder.actionName;
-        userRole = (builder.userRole == null)
-                 ? Const.ActivityLog.UNKNOWN : builder.userRole;
-        userName = (builder.userName == null)
-                 ? Const.ActivityLog.UNKNOWN : builder.userName;
-        userGoogleId = (builder.userGoogleId == null)
-                     ? Const.ActivityLog.UNKNOWN : builder.userGoogleId;
-        userEmail = (builder.userEmail == null)
-                  ? Const.ActivityLog.UNKNOWN : builder.userEmail;
-        logMessage = (builder.logMessage == null)
-                   ? Const.ActivityLog.UNKNOWN : builder.logMessage;
-        actionUrl = (builder.actionUrl == null)
-                  ? Const.ActivityLog.UNKNOWN : builder.actionUrl;
-        logId = (builder.logId == null)
-              ? Const.ActivityLog.UNKNOWN : builder.logId;
+        actionName = builder.actionName;
+        userRole = builder.userRole;
+        userName = builder.userName;
+        userGoogleId = builder.userGoogleId;
+        userEmail = builder.userEmail;
+        logMessage = builder.logMessage;
+        actionUrl = builder.actionUrl;
+        logId = builder.logId;
         actionTimeTaken = builder.actionTimeTaken;
         isMasqueradeUserRole = builder.isMasqueradeUserRole;
     }
@@ -399,8 +390,8 @@ public final class ActivityLogEntry {
     /**
      * A builder class for {@link ActivityLogEntry}.
      * <p>
-     * All null values (if possible) that are passed into the builder will be ignored and will be
-     * replaced by {@link Const.ActivityLog.UNKNOWN}
+     * All optional fields are initialized to {@link Const.ActivityLog.UNKNOWN}.
+     * All null values (if possible) that are passed into the builder will be ignored.
      * 
      * @see {@link ActivityLogEntry}
      */
@@ -422,33 +413,43 @@ public final class ActivityLogEntry {
         private boolean isMasqueradeUserRole;
         
         public Builder(String servletName, String url, long time) {
-            actionServletName = servletName;
-            actionUrl = url;
+            actionServletName = servletName == null ? Const.ActivityLog.UNKNOWN : servletName;
+            actionUrl = url == null ? Const.ActivityLog.UNKNOWN : url;
             logTime = time;
         }
         
         public Builder withActionName(String val) {
-            actionName = val;
+            if (val != null) {
+                actionName = val;
+            }
             return this;
         }
         
         public Builder withUserRole(String val) {
-            userRole = val;
+            if (val != null) {
+                userRole = val;
+            }
             return this;
         }
         
         public Builder withUserName(String val) {
-            userName = val;
+            if (val != null) {
+                userName = val;
+            }
             return this;
         }
         
         public Builder withUserGoogleId(String val) {
-            userGoogleId = val;
+            if (val != null) {
+                userGoogleId = val;
+            }
             return this;
         }
         
         public Builder withUserEmail(String val) {
-            userEmail = val;
+            if (val != null) {
+                userEmail = val;
+            }
             return this;
         }
         
@@ -458,12 +459,16 @@ public final class ActivityLogEntry {
         }
         
         public Builder withLogId(String val) {
-            logId = val;
+            if (val != null) {
+                logId = val;
+            }
             return this;
         }
         
         public Builder withLogMessage(String val) {
-            logMessage = val;
+            if (val != null) {
+                logMessage = val;
+            }
             return this;
         }
         
