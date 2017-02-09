@@ -89,8 +89,8 @@ public final class ActivityLogEntry {
                 + actionResponse + Const.ActivityLog.FIELD_SEPARATOR
                 + logToShow + Const.ActivityLog.FIELD_SEPARATOR
                 + userRole + (isMasqueradeUserRole ? "(M)" : "") + Const.ActivityLog.FIELD_SEPARATOR
-                + userName + Const.ActivityLog.FIELD_SEPARATOR + userGoogleId
-                + Const.ActivityLog.FIELD_SEPARATOR
+                + userName + Const.ActivityLog.FIELD_SEPARATOR
+                + userGoogleId + Const.ActivityLog.FIELD_SEPARATOR
                 + userEmail + Const.ActivityLog.FIELD_SEPARATOR
                 + logMessage + Const.ActivityLog.FIELD_SEPARATOR
                 + actionUrl + Const.ActivityLog.FIELD_SEPARATOR

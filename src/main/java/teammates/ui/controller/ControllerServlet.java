@@ -79,25 +79,25 @@ public class ControllerServlet extends HttpServlet {
             
         } catch (PageNotFoundException e) {
             log.warning(new ActivityLogGenerator()
-                                .generateServletActionFailureLogMessage(url, params, e, userType));
+                                .generateActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             resp.sendRedirect(Const.ViewURIs.ACTION_NOT_FOUND_PAGE);
         } catch (EntityNotFoundException e) {
             log.warning(new ActivityLogGenerator()
-                                .generateServletActionFailureLogMessage(url, params, e, userType));
+                                .generateActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             resp.sendRedirect(Const.ViewURIs.ENTITY_NOT_FOUND_PAGE);
 
         } catch (FeedbackSessionNotVisibleException e) {
             log.warning(new ActivityLogGenerator()
-                                .generateServletActionFailureLogMessage(url, params, e, userType));
+                                .generateActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             req.getSession().setAttribute(Const.ParamsNames.FEEDBACK_SESSION_NOT_VISIBLE, e.getStartTimeString());
             resp.sendRedirect(Const.ViewURIs.FEEDBACK_SESSION_NOT_VISIBLE);
             
         } catch (UnauthorizedAccessException e) {
             log.warning(new ActivityLogGenerator()
-                                .generateServletActionFailureLogMessage(url, params, e, userType));
+                                .generateActionFailureLogMessage(url, params, e, userType));
             cleanUpStatusMessageInSession(req);
             resp.sendRedirect(Const.ViewURIs.UNAUTHORIZED);
 
@@ -142,8 +142,8 @@ public class ControllerServlet extends HttpServlet {
                                                                   requestUrl, requestParams, userType, t);
             new EmailSender().sendReport(errorReport);
             if (errorReport != null) {
-                log.severe(new ActivityLogGenerator().generateSystemErrorReportLogMessage(url, params,
-                                                                        errorReport, userType));
+                log.severe(new ActivityLogGenerator()
+                                  .generateSystemErrorLogMessage(url, params, errorReport, userType));
             }
             
             cleanUpStatusMessageInSession(req);

@@ -58,6 +58,6 @@ public abstract class PublicResourcesServlet extends HttpServlet {
         String url = HttpRequestHelper.getRequestedUrl(request);
         Map<String, String[]> params = HttpRequestHelper.getParameterMap(request);
         log.warning(new ActivityLogGenerator()
-                        .generateBasicActivityLogMessage(url, params, message, userType));
+                            .generateBasicActivityLogMessage(url, params, message, userType));
     }
 }

@@ -57,7 +57,7 @@ public class PublicImageServlet extends PublicResourcesServlet {
             String url = HttpRequestHelper.getRequestedUrl(req);
             Map<String, String[]> params = HttpRequestHelper.getParameterMap(req);
             log.warning(new ActivityLogGenerator()
-                    .generateServletActionFailureLogMessage(url, params, e, userType));
+                                .generateActionFailureLogMessage(url, params, e, userType));
         }
     }
 

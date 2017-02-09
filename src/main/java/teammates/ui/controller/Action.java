@@ -435,8 +435,8 @@ public abstract class Action {
         UserType currUser = gateKeeper.getCurrentUser();
         String url = HttpRequestHelper.getRequestedUrl(request);
         Map<String, String[]> params = HttpRequestHelper.getParameterMap(request);
-        return new ActivityLogGenerator().generateNormalPageActionLogMessage(url, params,
-                                                                currUser, account, student, statusToAdmin);
+        return new ActivityLogGenerator().generatePageActionLogMessage(url, params, currUser, account,
+                                                                       student, statusToAdmin);
     }
     
     /**

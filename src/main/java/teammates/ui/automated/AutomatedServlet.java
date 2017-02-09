@@ -33,9 +33,9 @@ public class AutomatedServlet extends HttpServlet {
             // Do not log task queue worker actions to prevent excessive logging
             if (!url.startsWith("/worker/")) {
                 Map<String, String[]> params = HttpRequestHelper.getParameterMap(req);
-                log.info(new ActivityLogGenerator() // no logged-in user for automated servlet
-                                .generateBasicActivityLogMessage(url, params,
-                                                                 action.getActionMessage(), null));
+                // no logged-in user for automated servlet
+                ActivityLogGenerator logGenerator = new ActivityLogGenerator();
+                log.info(logGenerator.generateBasicActivityLogMessage(url, params, action.getActionMessage(), null));
             }
             
             action.execute();

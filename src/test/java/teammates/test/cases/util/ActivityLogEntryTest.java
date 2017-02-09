@@ -3,6 +3,7 @@ package teammates.test.cases.util;
 import org.testng.annotations.Test;
 
 import teammates.common.util.ActivityLogEntry;
+import teammates.common.util.ActivityLogEntry.Builder;
 import teammates.common.util.Const;
 import teammates.test.cases.BaseTestCase;
 import teammates.test.driver.AssertHelper;
@@ -14,15 +15,15 @@ public class ActivityLogEntryTest extends BaseTestCase {
 
     @Test
     public void testDefaultSettings() {
-        ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder("instructorHome", "URL", 10);
+        Builder builder = new Builder("instructorHome", "URL", 10);
         String logMessage = "TEAMMATESLOG|||instructorHome|||instructorHome|||true|||Unknown|||Unknown|||Unknown"
-                + "|||Unknown|||Unknown|||URL";
+                            + "|||Unknown|||Unknown|||URL";
         AssertHelper.assertLogMessageEquals(logMessage, builder.build().generateLogMessage());
     }
     
     @Test
     public void testBuilderNullValues() {
-        ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder(null, null, 10);
+        Builder builder = new Builder(null, null, 10);
         builder.withActionResponse(null)
                .withLogId(null)
                .withLogMessage(null)
@@ -31,7 +32,7 @@ public class ActivityLogEntryTest extends BaseTestCase {
                .withUserName(null)
                .withUserRole(null);
         String logMessage = "TEAMMATESLOG|||Unknown|||Unknown|||true|||Unknown|||Unknown|||Unknown"
-                + "|||Unknown|||Unknown|||Unknown";
+                            + "|||Unknown|||Unknown|||Unknown";
         ActivityLogEntry entry = builder.build();
         AssertHelper.assertLogMessageEquals(logMessage, entry.generateLogMessage());
         assertEquals(Const.ActivityLog.UNKNOWN, entry.getLogId());
@@ -44,9 +45,9 @@ public class ActivityLogEntryTest extends BaseTestCase {
         String statusToAdmin = "<span class=\"text-danger\">Error. ActivityLogEntry object is not created "
                                + "for this servlet action.</span><br>Message";
         String logMessage = "TEAMMATESLOG|||instructorHome|||Servlet Action Failure|||true"
-                + "|||Instructor(M)|||Joe|||GoogleIdA|||instructor@email.tmt"
-                + "|||" + statusToAdmin + "|||url.com";
-        ActivityLogEntry.Builder builder = new ActivityLogEntry.Builder("instructorHome", "url.com", 10);
+                            + "|||Instructor(M)|||Joe|||GoogleIdA|||instructor@email.tmt"
+                            + "|||" + statusToAdmin + "|||url.com";
+        Builder builder = new Builder("instructorHome", "url.com", 10);
         builder.withActionResponse(Const.ACTION_RESULT_FAILURE)
                .withUserRole(Const.ActivityLog.ROLE_INSTRUCTOR)
                .withUserName("Joe")
