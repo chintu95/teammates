@@ -3,8 +3,8 @@ package teammates.ui.automated;
 import java.util.List;
 import java.util.Map;
 
-import teammates.common.datatransfer.FeedbackResponseAttributes;
-import teammates.common.datatransfer.FeedbackSessionAttributes;
+import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
+import teammates.common.datatransfer.attributes.FeedbackSessionAttributes;
 import teammates.common.datatransfer.StudentEnrollDetails;
 import teammates.common.util.ActivityLogGenerator;
 import teammates.common.util.Assumption;

@@ -3,12 +3,10 @@ package teammates.test.cases.action;
 import java.util.List;
 import java.util.Map;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import teammates.common.datatransfer.DataBundle;
-import teammates.common.datatransfer.InstructorAttributes;
-import teammates.common.datatransfer.StudentAttributes;
+import teammates.common.datatransfer.attributes.InstructorAttributes;
+import teammates.common.datatransfer.attributes.StudentAttributes;
 import teammates.common.exception.EntityNotFoundException;
 import teammates.common.util.Const;
 import teammates.common.util.Const.ParamsNames;
@@ -16,21 +14,17 @@ import teammates.common.util.StringHelper;
 import teammates.common.util.TaskWrapper;
 import teammates.logic.core.StudentsLogic;
 import teammates.test.driver.AssertHelper;
-import teammates.ui.controller.Action;
 import teammates.ui.controller.InstructorCourseRemindAction;
 import teammates.ui.controller.RedirectResult;
 
 public class InstructorCourseRemindActionTest extends BaseActionTest {
-
-    private final DataBundle dataBundle = getTypicalDataBundle();
     
-    @BeforeClass
-    public void classSetup() {
-        printTestClassHeader();
-        removeAndRestoreTypicalDataBundle();
-        uri = Const.ActionURIs.INSTRUCTOR_COURSE_REMIND;
+    @Override
+    protected String getActionUri() {
+        return Const.ActionURIs.INSTRUCTOR_COURSE_REMIND;
     }
     
+    @Override
     @Test
     public void testExecuteAndPostProcess() throws Exception {
         
@@ -41,24 +35,25 @@ public class InstructorCourseRemindActionTest extends BaseActionTest {
 
         ______TS("Typical case: Send email to remind an instructor to register for the course");
         gaeSimulation.loginAsInstructor(instructorId);
-        InstructorAttributes anotherInstructorOfCourse1 = dataBundle.instructors.get("instructor2OfCourse1");
+        InstructorAttributes anotherInstructorOfCourse1 = dataBundle.instructors.get("instructorNotYetJoinCourse1");
         String[] submissionParams = new String[]{
                 Const.ParamsNames.COURSE_ID, courseId,
                 Const.ParamsNames.INSTRUCTOR_EMAIL, anotherInstructorOfCourse1.email
         };
         
-        Action remindAction = getAction(submissionParams);
-        RedirectResult redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
+        InstructorCourseRemindAction remindAction = getAction(submissionParams);
+        RedirectResult redirectResult = getRedirectResult(remindAction);
         
         assertEquals(Const.ActionURIs.INSTRUCTOR_COURSE_EDIT_PAGE, redirectResult.destination);
         assertFalse(redirectResult.isError);
         assertEquals(Const.StatusMessages.COURSE_REMINDER_SENT_TO + anotherInstructorOfCourse1.email,
                      redirectResult.getStatusMessage());
-             
+
         String expectedLogSegment = "Registration Key sent to the following users "
                 + "in Course <span class=\"bold\">[" + courseId + "]</span>:<br>"
                 + anotherInstructorOfCourse1.name + "<span class=\"bold\"> ("
-                + anotherInstructorOfCourse1.email + ")" + "</span>.<br>";
+                + anotherInstructorOfCourse1.email + ")" + "</span>.<br>"
+                + StringHelper.encrypt(anotherInstructorOfCourse1.key) + "<br>";
         AssertHelper.assertContains(expectedLogSegment, remindAction.getLogMessage());
 
         verifySpecifiedTasksAdded(remindAction, Const.TaskQueue.INSTRUCTOR_COURSE_JOIN_EMAIL_QUEUE_NAME, 1);
@@ -77,7 +72,7 @@ public class InstructorCourseRemindActionTest extends BaseActionTest {
         };
         
         remindAction = getAction(submissionParams);
-        redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
+        redirectResult = getRedirectResult(remindAction);
         
         assertEquals(Const.ActionURIs.INSTRUCTOR_COURSE_DETAILS_PAGE, redirectResult.destination);
         assertFalse(redirectResult.isError);
@@ -116,7 +111,7 @@ public class InstructorCourseRemindActionTest extends BaseActionTest {
                 Const.ParamsNames.COURSE_ID, courseId
         };
         remindAction = getAction(addUserIdToParams(instructorId, submissionParams));
-        redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
+        redirectResult = getRedirectResult(remindAction);
         assertEquals(Const.ActionURIs.INSTRUCTOR_COURSE_DETAILS_PAGE, redirectResult.destination);
         assertFalse(redirectResult.isError);
         assertEquals(Const.StatusMessages.COURSE_REMINDERS_SENT,
@@ -152,7 +147,7 @@ public class InstructorCourseRemindActionTest extends BaseActionTest {
                 Const.ParamsNames.COURSE_ID, courseId
         };
         remindAction = getAction(addUserIdToParams(instructorId, submissionParams));
-        redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
+        redirectResult = getRedirectResult(remindAction);
         assertEquals(Const.ActionURIs.INSTRUCTOR_COURSE_DETAILS_PAGE, redirectResult.destination);
         assertFalse(redirectResult.isError);
         assertEquals(Const.StatusMessages.COURSE_REMINDERS_SENT, redirectResult.getStatusMessage());
@@ -171,43 +166,39 @@ public class InstructorCourseRemindActionTest extends BaseActionTest {
                 Const.ParamsNames.INSTRUCTOR_EMAIL, invalidEmail
         };
         
-        try {
-            remindAction = getAction(addUserIdToParams(instructorId, submissionParams));
-            redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
-            signalFailureToDetectException();
-        } catch (EntityNotFoundException e) {
-            ignoreExpectedException();
-        }
+        executeAndAssertEntityNotFoundException(instructorId, submissionParams);
         
         submissionParams = new String[]{
                 Const.ParamsNames.COURSE_ID, courseId,
                 Const.ParamsNames.STUDENT_EMAIL, invalidEmail
         };
         
-        try {
-            remindAction = getAction(addUserIdToParams(instructorId, submissionParams));
-            redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
-            signalFailureToDetectException();
-        } catch (EntityNotFoundException e) {
-            ignoreExpectedException();
-        }
-        
+        executeAndAssertEntityNotFoundException(instructorId, submissionParams);
+
+        ______TS("Failure case: Invalid course id parameter");
+
         submissionParams = new String[]{
-                Const.ParamsNames.COURSE_ID, "invalidCourseId"
+                Const.ParamsNames.COURSE_ID, "invalidCourseId",
+                Const.ParamsNames.INSTRUCTOR_EMAIL, anotherInstructorOfCourse1.email
         };
         
+        executeAndAssertEntityNotFoundException(instructorId, submissionParams);
+    }
+
+    private void executeAndAssertEntityNotFoundException(String instructorId,
+                                                         String[] submissionParams) {
         try {
-            remindAction = getAction(addUserIdToParams(instructorId, submissionParams));
-            redirectResult = (RedirectResult) remindAction.executeAndPostProcess();
-            signalFailureToDetectException();
+            InstructorCourseRemindAction remindAction = getAction(addUserIdToParams(instructorId, submissionParams));
+            remindAction.executeAndPostProcess();
+            signalFailureToDetectException(" - EntityNotFoundException");
         } catch (EntityNotFoundException e) {
             ignoreExpectedException();
         }
-        
     }
 
-    private InstructorCourseRemindAction getAction(String... parameters) {
-        return (InstructorCourseRemindAction) gaeSimulation.getActionObject(uri, parameters);
+    @Override
+    protected InstructorCourseRemindAction getAction(String... params) {
+        return (InstructorCourseRemindAction) gaeSimulation.getActionObject(getActionUri(), params);
     }
 
 }
