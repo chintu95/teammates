@@ -23,19 +23,19 @@
                 </c:if>
                 <c:forEach items="${logs}" var="log" varStatus="count">
                     <tr id="${count.first ? "first-row" : ""}">
-                        <td class="${log.isTimeTakenWarning ? "warning" : 
-                        		             log.isTimeTakenDanger ? "danger" : "" }">
+                        <td class="${log.isActionTimeTakenModerate ? "warning" : 
+                        		                 log.isActionTimeTakenSlow ? "danger" : "" }">
                             <a onclick="submitLocalTimeAjaxRequest('${log.logTime}','${log.userGoogleId}','${log.displayedRole}', this);">
                                 ${log.displayedLogTime}
                             </a>
                             <p class="localTime"></p>
-                            <p class="${log.isTimeTakenWarning ? "text-warning" : 
-                                             log.isTimeTakenDanger ? "text-danger" : "" }">
+                            <p class="${log.isActionTimeTakenModerate ? "text-warning" : 
+                                                log.isActionTimeTakenSlow ? "text-danger" : "" }">
                                 <strong>${log.displayedLogTimeTaken}</strong>
                             </p>
                         </td>
-                        <td class="${log.isTimeTakenWarning ? "warning" : 
-                                             log.isTimeTakenDanger ? "danger" : "" }">
+                        <td class="${log.isActionTimeTakenModerate ? "warning" : 
+                                             log.isActionTimeTakenSlow ? "danger" : "" }">
                             <form method="get" action="<%= Const.ActionURIs.ADMIN_ACTIVITY_LOG_PAGE %>">
                                 <h4 class="list-group-item-heading">
                                     <c:choose>
@@ -59,8 +59,7 @@
                                         <span class="glyphicon glyphicon-eye-open text-danger"></span>
                                     </c:if>
                                     <a href="${log.displayedActionUrl}" 
-                                       class="${log.isActionWarning || log.isActionDanger 
-                                                    ? "text-danger" : "" }" 
+                                       class="${log.isActionFailure || log.isActionErrorReport ? "text-danger" : "" }" 
                                        target="_blank">
                                         ${log.actionName}
                                     </a>
@@ -79,8 +78,8 @@
                                         <a href="mailto:${log.userEmail}" target="_blank">${log.userEmail}</a>
                                         ]
                                     </small>
-                                    <button type="submit" class="btn btn-xs ${log.isActionWarning ? "btn-warning" : 
-                                                                                 log.isActionDanger ? "btn-danger" : "btn-info"}">
+                                    <button type="submit" class="btn btn-xs ${log.isActionFailure ? "btn-warning" : 
+                                                                                      isActionErrorReport ? "btn-danger" : "btn-info"}">
                                         <span class="glyphicon glyphicon-zoom-in"></span>
                                     </button>
                                     <input type="hidden" name="filterQuery" value="person:${log.userIdentity}">

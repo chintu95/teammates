@@ -160,9 +160,9 @@ public class AdminActivityLogPageData extends PageData {
     }
     
     /**
-     * check current log entry should be included or not.
+     * Checks whether the current log entry should be included or not.
      * 
-     * returns false if the logEntry is regarded as rubbish
+     * @returns true if it should be included
      */
     private boolean shouldIncludeLogEntry(ActivityLogEntry logEntry) {
         

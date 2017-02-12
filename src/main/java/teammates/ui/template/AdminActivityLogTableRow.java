@@ -11,12 +11,11 @@ import teammates.common.util.Url;
 
 public class AdminActivityLogTableRow {
     
-    private static final int TIME_TAKEN_WARNING_LOWER_RANGE = 10000;
-    private static final int TIME_TAKEN_WARNING_UPPER_RANGE = 20000;
-    private static final int TIME_TAKEN_DANGER_UPPER_RANGE = 60000;
+    private static final int TIME_TAKEN_EXPECTED = 10000;
+    private static final int TIME_TAKEN_MODERATE = 20000;
     
-    private static final String ACTION_UNSCCUSSFUL_HIGHLIGHTER_FRONT = "<span class=\"text-danger\"><strong>";
-    private static final String ACTION_UNSCCUSSFUL_HIGHLIGHTER_BACK = "</strong><span>";
+    private static final String ACTION_UNSUCCESSFUL_HIGHLIGHTER_FRONT = "<span class=\"text-danger\"><strong>";
+    private static final String ACTION_UNSUCCESSFUL_HIGHLIGHTER_BACK = "</strong><span>";
     
     private static final String KEYWORDS_HIGHLIGHTER_FRONT = "<mark>";
     private static final String KEYWORDS_HIGHLIGHTER_BACK = "</mark>";
@@ -94,22 +93,20 @@ public class AdminActivityLogTableRow {
         return activityLog.getRole().contains(Const.ActivityLog.ROLE_UNREGISTERED);
     }
     
-    public boolean getIsTimeTakenWarning() {
-        return activityLog.getTimeTaken() >= TIME_TAKEN_WARNING_LOWER_RANGE
-                && activityLog.getTimeTaken() <= TIME_TAKEN_WARNING_UPPER_RANGE;
+    public boolean getIsActionTimeTakenModerate() {
+        return activityLog.getTimeTaken() >= TIME_TAKEN_EXPECTED
+                && activityLog.getTimeTaken() <= TIME_TAKEN_MODERATE;
     }
     
-    public boolean getIsTimeTakenDanger() {
-        return activityLog.getTimeTaken() > TIME_TAKEN_WARNING_UPPER_RANGE
-                && activityLog.getTimeTaken() <= TIME_TAKEN_DANGER_UPPER_RANGE;
-        // TODO : check why there is upper range
+    public boolean getIsActionTimeTakenSlow() {
+        return activityLog.getTimeTaken() > TIME_TAKEN_MODERATE;
     }
     
-    public boolean getIsActionWarning() {
+    public boolean getIsActionFailure() {
         return activityLog.getAction().contains(Const.ACTION_RESULT_FAILURE);
     }
     
-    public boolean getIsActionDanger() {
+    public boolean getIsActionErrorReport() {
         return activityLog.getAction().contains(Const.ACTION_RESULT_SYSTEM_ERROR_REPORT);
     }
     
@@ -145,7 +142,7 @@ public class AdminActivityLogTableRow {
                 Const.ACTION_RESULT_SYSTEM_ERROR_REPORT
         };
         displayedMessage = highlightKeyword(displayedMessage, keywords,
-                ACTION_UNSCCUSSFUL_HIGHLIGHTER_FRONT, ACTION_UNSCCUSSFUL_HIGHLIGHTER_BACK);
+                ACTION_UNSUCCESSFUL_HIGHLIGHTER_FRONT, ACTION_UNSUCCESSFUL_HIGHLIGHTER_BACK);
         displayedMessage = highlightKeyword(displayedMessage, keyStringsToHighlight,
                 KEYWORDS_HIGHLIGHTER_FRONT, KEYWORDS_HIGHLIGHTER_BACK);
         return displayedMessage;
@@ -186,7 +183,6 @@ public class AdminActivityLogTableRow {
     // TODO: can be generalized to helper method
     private String highlightKeyword(String original, String[] keywords,
                                     String wrapperTagFront, String wrapperTagEnd) {
-        
         if (keywords == null) {
             return original;
         }
@@ -194,14 +190,8 @@ public class AdminActivityLogTableRow {
         String highlightedString = original;
         
         for (String stringToHighlight : keywords) {
-            if (highlightedString.toLowerCase().contains(stringToHighlight.toLowerCase())) {
-                
-                int startIndex = original.toLowerCase().indexOf(stringToHighlight.toLowerCase());
-                int endIndex = startIndex + stringToHighlight.length();
-                String realStringToHighlight = original.substring(startIndex, endIndex);
-                highlightedString = highlightedString.replace(realStringToHighlight,
-                        wrapperTagFront + realStringToHighlight + wrapperTagEnd);
-            }
+            highlightedString = highlightedString.replaceAll("(?i)(" + stringToHighlight + ")",
+                    wrapperTagFront + "$1" + wrapperTagEnd);
         }
         
         return highlightedString;
