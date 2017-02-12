@@ -15,10 +15,10 @@ public class AdminActivityLogTableRow {
     private static final int TIME_TAKEN_MODERATE = 20000;
     
     private static final String ACTION_UNSUCCESSFUL_HIGHLIGHTER_FRONT = "<span class=\"text-danger\"><strong>";
-    private static final String ACTION_UNSUCCESSFUL_HIGHLIGHTER_BACK = "</strong><span>";
+    private static final String ACTION_UNSUCCESSFUL_HIGHLIGHTER_END = "</strong><span>";
     
     private static final String KEYWORDS_HIGHLIGHTER_FRONT = "<mark>";
-    private static final String KEYWORDS_HIGHLIGHTER_BACK = "</mark>";
+    private static final String KEYWORDS_HIGHLIGHTER_END = "</mark>";
     
     private ActivityLogEntry activityLog;
     
@@ -142,9 +142,9 @@ public class AdminActivityLogTableRow {
                 Const.ACTION_RESULT_SYSTEM_ERROR_REPORT
         };
         displayedMessage = highlightKeyword(displayedMessage, keywords,
-                ACTION_UNSUCCESSFUL_HIGHLIGHTER_FRONT, ACTION_UNSUCCESSFUL_HIGHLIGHTER_BACK);
+                ACTION_UNSUCCESSFUL_HIGHLIGHTER_FRONT, ACTION_UNSUCCESSFUL_HIGHLIGHTER_END);
         displayedMessage = highlightKeyword(displayedMessage, keyStringsToHighlight,
-                KEYWORDS_HIGHLIGHTER_FRONT, KEYWORDS_HIGHLIGHTER_BACK);
+                KEYWORDS_HIGHLIGHTER_FRONT, KEYWORDS_HIGHLIGHTER_END);
         return displayedMessage;
     }
     
