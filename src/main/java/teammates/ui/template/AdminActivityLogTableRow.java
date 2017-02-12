@@ -1,6 +1,5 @@
 package teammates.ui.template;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -117,14 +116,11 @@ public class AdminActivityLogTableRow {
                 Const.ParamsNames.USER_ID, activityLog.getGoogleId());
     }
 
-    // TODO find a way to make use of TimeHelper
     public String getDisplayedLogTime() {
-        Calendar appCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        sdf.setTimeZone(TimeZone.getTimeZone(Const.SystemParams.ADMIN_TIME_ZONE));
+        Calendar appCal = Calendar.getInstance(TimeZone.getTimeZone(Const.DEFAULT_TIMEZONE));
         appCal.setTimeInMillis(activityLog.getTime());
-    
-        return sdf.format(appCal.getTime());
+        appCal = TimeHelper.convertToUserTimeZone(appCal, Const.SystemParams.ADMIN_TIME_ZONE_DOUBLE);
+        return TimeHelper.calendarToString(appCal);
     }
 
     public String getDisplayedRole() {
