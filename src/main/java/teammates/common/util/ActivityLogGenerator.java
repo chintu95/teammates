@@ -8,9 +8,9 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import teammates.common.datatransfer.AccountAttributes;
-import teammates.common.datatransfer.StudentAttributes;
 import teammates.common.datatransfer.UserType;
+import teammates.common.datatransfer.attributes.AccountAttributes;
+import teammates.common.datatransfer.attributes.StudentAttributes;
 import teammates.common.exception.TeammatesException;
 import teammates.common.util.ActivityLogEntry.Builder;
 

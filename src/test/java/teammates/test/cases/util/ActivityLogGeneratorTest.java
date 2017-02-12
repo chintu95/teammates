@@ -8,9 +8,9 @@ import org.testng.annotations.Test;
 import com.beust.jcommander.internal.Maps;
 import com.google.appengine.api.log.AppLogLine;
 
-import teammates.common.datatransfer.AccountAttributes;
-import teammates.common.datatransfer.StudentAttributes;
 import teammates.common.datatransfer.UserType;
+import teammates.common.datatransfer.attributes.AccountAttributes;
+import teammates.common.datatransfer.attributes.StudentAttributes;
 import teammates.common.exception.PageNotFoundException;
 import teammates.common.exception.UnauthorizedAccessException;
 import teammates.common.util.ActivityLogEntry;
