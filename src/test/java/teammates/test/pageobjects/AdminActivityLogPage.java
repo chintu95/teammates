@@ -118,7 +118,7 @@ public class AdminActivityLogPage extends AppPage {
     }
 
     public Date getDateOfEarliestLog() throws ParseException {
-        String dateFormat = "dd-MM-yyyy HH:mm:ss";
+        String dateFormat = "MM/dd/yyyy HH:mm:ss SSS";
         DateFormat sdf = new SimpleDateFormat(dateFormat);
         String dateTimeString = getLogsTable().findElement(By.cssSelector("tr:last-child > td > a")).getText();
         
